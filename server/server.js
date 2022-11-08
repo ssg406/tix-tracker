@@ -13,20 +13,26 @@ app.use(express.urlencoded({ extended: true }));
 
 // Router middleware
 app.use(authRouter);
-app.use("/api/v1", ticketRouter);
+app.use("/api/v1/tickets", ticketRouter);
 
 // TODO: Error middleware
 app.use(errorHandler);
 // Start server and listen for requests
 const startUp = async () => {
+  let dbUri;
+  if (process.env.NODE_ENV === "test") {
+    dbUri = process.env.ATLAS_URI_TEST;
+  } else {
+    dbUri = process.env.ATLAS_URI;
+  }
   try {
-    await dbConnector(process.env.ATLAS_URI);
-    app.listen(process.env.PORT, () => {
-      console.log(`Server is up and listening on port ${process.env.PORT}`);
-    });
+    await dbConnector(dbUri);
+    app.listen(process.env.PORT);
   } catch (error) {
     console.log(error);
   }
 };
 
 startUp();
+
+export { app };

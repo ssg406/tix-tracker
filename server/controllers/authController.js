@@ -9,7 +9,7 @@ import {
 const registerUser = async (req, res, next) => {
   const { email, password, name, role } = req.body;
   try {
-    // Throws if fields are missing
+    // Throws if fields are missing or email duplicated
     const user = await User.create(req.body);
     const token = user.createToken();
     res.status(StatusCodes.CREATED).json({
@@ -17,6 +17,7 @@ const registerUser = async (req, res, next) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        createdAt: user.createdAt,
       },
       token,
     });
@@ -47,7 +48,7 @@ const loginUser = async (req, res, next) => {
         token,
       });
     } else {
-      throw new AuthenticationError("User details incorrect");
+      throw new AuthenticationError("Invalid user details");
     }
   } catch (error) {
     next(error);

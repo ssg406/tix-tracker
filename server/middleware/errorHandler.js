@@ -16,7 +16,8 @@ const errorHandler = (err, req, res, next) => {
   // Check for mongoose duplicate of unique key error
   else if (err.code && err.code === 11000) {
     const fields = Object.keys(err.keyValue);
-    const messages = `An account with ${fields} already exists`;
+    const messages = `An account with the specified ${fields} already exists`;
+    res.status(StatusCodes.CONFLICT).json({ fields, messages });
     // Return general error
   } else {
     res.status(thrownError.statusCode).json({ message: thrownError.message });
