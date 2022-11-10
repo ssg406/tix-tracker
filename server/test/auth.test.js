@@ -60,6 +60,11 @@ describe("Authorization Routes", () => {
       done();
     });
   });
+  after((done) => {
+    User.deleteMany({}, (err) => {
+      done();
+    });
+  });
   describe("/register new user (POST)", () => {
     it("A new user should be created", (done) => {
       chai

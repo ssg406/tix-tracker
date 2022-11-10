@@ -19,12 +19,14 @@ const testUser = {
   role: "user",
 };
 
+const testAddTicket = {
+  date: "2022/10/11",
+  description: "Test Description",
+  createdBy: "636c4bc1a5771a9e362e4169",
+};
+
 const validObjectId = "6369ff8ba505b65f05ce2343";
 
-const validTicket = {
-  date: new Date(),
-  description: "A description of a ticket",
-};
 const ticketNoDate = {
   description: "Only a description",
 };
@@ -33,21 +35,18 @@ const ticketNoDescription = {
 };
 
 describe("Ticket Routes at /api/v1/tickets", () => {
-  beforeEach((done) => {
-    Ticket.deleteMany({}, (err) => {
-      done();
-    });
+  after((done) => {
+    Ticket.deleteMany({}).then(() => done());
   });
-
-  describe("/tickets GET all tickets", () => {
-    beforeEach((done) => {
-      const testTicket = Ticket.create(validTicket);
-      testTicket.save().then(() => done());
+  describe("/all GET all tickets", () => {
+    before((done) => {
+      const newTicket = new Ticket(testAddTicket);
+      newTicket.save().then(() => done());
     });
     it("All tickets should be returned", (done) => {
       chai
         .request(app)
-        .get("api/v1/tickets/all")
+        .get("/api/v1/tickets/all")
         .end((err, res) => {
           res.should.have.status(StatusCodes.OK);
           res.body.should.be.a("array");
@@ -61,8 +60,8 @@ describe("Ticket Routes at /api/v1/tickets", () => {
     it("Valid ticket should be created and returned with ID", (done) => {
       chai
         .request(app)
-        .post("api/v1/tickets/new")
-        .send(validTicket)
+        .post("/api/v1/tickets/new")
+        .send(testAddTicket)
         .end((err, res) => {
           res.should.have.status(StatusCodes.CREATED);
           res.body.should.be.a("object");
@@ -77,7 +76,7 @@ describe("Ticket Routes at /api/v1/tickets", () => {
     it("Ticket missing date should be rejected with error message", (done) => {
       chai
         .request(app)
-        .post("api/v1/tickets/new")
+        .post("/api/v1/tickets/new")
         .send(ticketNoDate)
         .end((err, res) => {
           res.should.have.status(StatusCodes.BAD_REQUEST);
@@ -90,7 +89,7 @@ describe("Ticket Routes at /api/v1/tickets", () => {
     it("Ticket missing description should be rejected with error message", (done) => {
       chai
         .request(app)
-        .post("api/v1/tickets/new")
+        .post("/api/v1/tickets/new")
         .send(ticketNoDescription)
         .end((err, res) => {
           res.should.have.status(StatusCodes.BAD_REQUEST);
@@ -103,11 +102,17 @@ describe("Ticket Routes at /api/v1/tickets", () => {
   });
 
   describe("/updateTicket PATCH modify ticket", () => {
+    let existingId;
+    before((done) => {
+      const existingTicket = new Ticket(testAddTicket);
+      existingTicket.save().then(() => done());
+      existingId = existingTicket._id;
+    });
     it("Updated ticket should be accepted and details returned", (done) => {
       chai
         .request(app)
-        .post("api/v1/tickets/update")
-        .send({ ...validTicket, description: "New Description" })
+        .patch("/api/v1/tickets/update")
+        .send({ _id: existingId, description: "New Description" })
         .end((err, res) => {
           res.should.have.status(StatusCodes.OK);
           res.body.should.be.a("object");
@@ -115,32 +120,29 @@ describe("Ticket Routes at /api/v1/tickets", () => {
           res.body.ticket.should.have.property("_id");
           res.body.ticket.should.have.property("status");
           res.body.ticket.should.have.property("createdBy");
-          res.body.ticket.should.have.property("description");
-          res.body.ticket.description.should.eql("New Description");
+          res.body.ticket.should.have
+            .property("description")
+            .eql("New Description");
           done();
         });
     });
   });
 
   describe("/deleteTicket DELETE deletes ticket", () => {
-    beforeEach((dont) => {
-      const testTicket = new Ticket(validTicket);
-      testTicket.save().then(() => done());
+    let existingId;
+    before((done) => {
+      const existingTicket = new Ticket(testAddTicket);
+      existingTicket.save().then(() => done());
+      existingId = existingTicket._id;
     });
     it("Ticket should be removed if correct details given", (done) => {
-      const ticket = Ticket.findOne({
-        date: testTicket.date,
-        description: testTicket.description,
-      });
-      const { _id } = ticket;
       chai
         .request(app)
-        .delete("api/v1/tickets/delete")
-        .send({ _id })
+        .delete("/api/v1/tickets/delete")
+        .send({ _id: existingId })
         .end((err, res) => {
-          res.body.should.have.status(StatusCodes.OK);
+          res.should.have.status(StatusCodes.OK);
           res.body.should.be.a("object");
-          res.body.should.have.property("_id");
           res.body.should.have.property("message");
           res.body.message.should.eql("Ticket deleted");
           done();
@@ -149,11 +151,11 @@ describe("Ticket Routes at /api/v1/tickets", () => {
     it("Not found message should be sent if no ticket exists", (done) => {
       chai
         .request(app)
-        .delete("api/v1/tickets/delete")
+        .delete("/api/v1/tickets/delete")
         .send({ _id: validObjectId })
         .end((err, res) => {
           res.body.should.be.a("object");
-          res.status.should.be(StatusCodes.NOT_FOUND);
+          res.should.have.status(StatusCodes.NOT_FOUND);
           res.body.should.have.property("message");
           res.body.message.should.eql("Could not find a ticket with that ID");
           done();
@@ -162,13 +164,13 @@ describe("Ticket Routes at /api/v1/tickets", () => {
     it("Error mesage should be sent if invalid ID is given", (done) => {
       chai
         .request(app)
-        .delete("api/v1/tickets/delete")
-        .send("Invalid ID")
+        .delete("/api/v1/tickets/delete")
+        .send({ _id: "invalid id" })
         .end((err, res) => {
-          res.status.should.be(StatusCodes.BAD_REQUEST);
+          res.should.have.status(StatusCodes.BAD_REQUEST);
           res.body.should.be.a("object");
           res.body.should.have.property("fields");
-          res.body.fields.should.eql(["_id"]);
+          res.body.fields.should.eql("_id");
           res.body.should.have.property("messages");
           res.body.messages.should.eql(
             "Field is invalid for the given request"

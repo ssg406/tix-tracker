@@ -13,7 +13,7 @@ const TicketSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: ["open", "closed", "cancelled", "accepted", "in-progress"],
-    default: open,
+    default: "open",
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,

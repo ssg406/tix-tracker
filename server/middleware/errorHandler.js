@@ -13,6 +13,12 @@ const errorHandler = (err, req, res, next) => {
     const messages = Object.values(err.errors).map((field) => field.message);
     res.status(StatusCodes.BAD_REQUEST).json({ fields, messages });
   }
+  // Check for invalid argument to mongoose function, such as invalid ID
+  if (err.name === "CastError") {
+    const fields = err.path;
+    const messages = "Field is invalid for the given request";
+    res.status(StatusCodes.BAD_REQUEST).json({ fields, messages });
+  }
   // Check for mongoose duplicate of unique key error
   else if (err.code && err.code === 11000) {
     const fields = Object.keys(err.keyValue);
