@@ -1,7 +1,12 @@
 import { Register } from "./pages";
+import { AppContextProvider } from "./context";
 
 const App = () => {
-  return <Register />;
+  return (
+    <AppContextProvider>
+      <Register />
+    </AppContextProvider>
+  );
 };
 
 export default App;

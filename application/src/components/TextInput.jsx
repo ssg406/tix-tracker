@@ -5,7 +5,7 @@ const TextInput = ({ name, type, handleChange, value }) => {
         {name}
       </label>
       <input
-        className="border-b-2 focus:outline-0 px-4 py-1 border-neutral-800 focus:bg-neutral-200 focus:rounded-t-md"
+        className="border-b-2 focus:outline-0 px-4 py-2 border-neutral-800 focus:bg-neutral-200 focus:rounded-t-md bg-transparent"
         type={type}
         name={name}
         onChange={handleChange}
