@@ -5,6 +5,12 @@ import {
   HIDE_ALERT,
   LOGOUT_USER,
   TOGGLE_MOBILE_NAV,
+  START_UPDATE_USER,
+  SUCCESS_UPDATE_USER,
+  ERROR_UPDATE_USER,
+  START_CREATE_TICKET,
+  SUCCESS_CREATE_TICKET,
+  ERROR_CREATE_TICKET,
 } from "./actions";
 
 const reducer = (state, action) => {
@@ -28,6 +34,7 @@ const reducer = (state, action) => {
         ...state,
         isLoading: false,
         showAlert: true,
+        alerType: "danger",
         alertText: action.payload.message,
       };
     case LOGOUT_USER:
@@ -45,6 +52,47 @@ const reducer = (state, action) => {
       return {
         ...state,
         showMobileNav: !state.showMobileNav,
+      };
+    case START_UPDATE_USER:
+      return {
+        ...state,
+        isLoading: true,
+      };
+    case SUCCESS_UPDATE_USER:
+      return {
+        ...state,
+        isLoading: false,
+        showAlert: true,
+        alertText: "User updated successfully",
+      };
+    case ERROR_UPDATE_USER:
+      return {
+        ...state,
+        isLoading: false,
+        showAlert: true,
+        alertType: "danger",
+        alertText: action.payload.message,
+      };
+    case START_CREATE_TICKET:
+      return {
+        ...state,
+        isLoading: true,
+      };
+    case SUCCESS_CREATE_TICKET:
+      return {
+        ...state,
+        isLoading: false,
+        showAlert: true,
+        alertType: "success",
+        alertText: "Ticket created successfully!",
+      };
+    case ERROR_CREATE_TICKET:
+      return {
+        ...state,
+        isLoading: false,
+        showAlert: true,
+        alertType: "danger",
+        alertText: action.payload.message,
       };
     default:
       throw new Error("Invalid argument to reducer");

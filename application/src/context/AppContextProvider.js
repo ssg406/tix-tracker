@@ -6,10 +6,15 @@ import {
   START_SETUP_USER,
   SUCCESS_SETUP_USER,
   ERROR_SETUP_USER,
-  SHOW_ALERT,
   HIDE_ALERT,
   LOGOUT_USER,
   TOGGLE_MOBILE_NAV,
+  START_UPDATE_USER,
+  SUCCESS_UPDATE_USER,
+  ERROR_UPDATE_USER,
+  START_CREATE_TICKET,
+  SUCCESS_CREATE_TICKET,
+  ERROR_CREATE_TICKET,
 } from "./actions";
 
 // Check local storage for saved user and token
@@ -62,7 +67,6 @@ const AppContextProvider = ({ children }) => {
     try {
       const { data } = await axiosInstance.post(`auth/${endpoint}`, formState);
       const { user, token } = data;
-      console.info(user);
       addUserToLocalStorage({ user, token });
       dispatch({
         type: SUCCESS_SETUP_USER,
@@ -82,7 +86,26 @@ const AppContextProvider = ({ children }) => {
     removeUserFromLocalStorage();
   };
 
-  const updateUser = (userDetails) => {};
+  const updateUser = async (userDetails) => {
+    dispatch({ type: START_UPDATE_USER });
+    console.log(userDetails);
+    try {
+      const { data } = await axiosInstance.patch("auth/updateUser", {
+        userId: state.user.userId,
+        email: userDetails.email,
+        name: userDetails.name,
+      });
+      const { user } = data;
+      localStorage.setItem("user", JSON.stringify(user));
+      dispatch({ type: SUCCESS_UPDATE_USER, payload: user });
+    } catch (error) {
+      dispatch({
+        type: ERROR_UPDATE_USER,
+        payload: { message: error.response.data.message },
+      });
+    }
+    clearAlert();
+  };
 
   const addUserToLocalStorage = ({ user, token }) => {
     localStorage.setItem("user", JSON.stringify(user));
@@ -98,9 +121,25 @@ const AppContextProvider = ({ children }) => {
     dispatch({ type: TOGGLE_MOBILE_NAV });
   };
 
-  const contextStateValue = useMemo(() => {
-    // contextState values
-  }, []);
+  const createTicket = ({ date, description }) => {
+    dispatch({ type: START_CREATE_TICKET });
+    const createdBy = state.user.userId;
+    try {
+      axiosInstance.post("tickets/new", {
+        date: date,
+        createdBy: createdBy,
+        description: description,
+      });
+      dispatch({ type: SUCCESS_CREATE_TICKET });
+    } catch (error) {
+      console.log(`THE ERROR WAS ${error.response.data}`);
+      dispatch({
+        type: ERROR_CREATE_TICKET,
+        payload: { message: error.response.data.message },
+      });
+    }
+    clearAlert();
+  };
 
   return (
     <AppContextState.Provider
@@ -110,6 +149,7 @@ const AppContextProvider = ({ children }) => {
         toggleMobileNav,
         logoutUser,
         updateUser,
+        createTicket,
       }}
     >
       {children}
