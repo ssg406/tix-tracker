@@ -1,4 +1,5 @@
 import express from "express";
+import checkToken from "../middleware/authHandler.js";
 import {
   registerUser,
   loginUser,
@@ -11,6 +12,6 @@ authRouter.route("/register").post(registerUser);
 
 authRouter.route("/login").post(loginUser);
 
-authRouter.route("/updateUser").patch(updateUser);
+authRouter.route("/updateUser").patch(checkToken, updateUser);
 
 export default authRouter;

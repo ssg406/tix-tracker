@@ -14,6 +14,7 @@ const registerUser = async (req, res, next) => {
     const token = user.createToken();
     res.status(StatusCodes.CREATED).json({
       user: {
+        userId: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -41,6 +42,7 @@ const loginUser = async (req, res, next) => {
       const token = user.createToken();
       res.status(StatusCodes.OK).json({
         user: {
+          userId: user._id,
           name: user.name,
           email: user.email,
           role: user.role,
@@ -55,8 +57,28 @@ const loginUser = async (req, res, next) => {
   }
 };
 
-const updateUser = (req, res, next) => {
-  // Update User
+const updateUser = async (req, res, next) => {
+  try {
+    const { name, email, userId } = req.body;
+
+    const user = await User.findById(userId);
+
+    user.name = name;
+    user.email = email;
+
+    await user.save();
+
+    res.status(StatusCodes.OK).json({
+      user: {
+        userId: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 export { registerUser, loginUser, updateUser };

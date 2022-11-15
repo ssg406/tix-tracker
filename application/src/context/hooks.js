@@ -4,7 +4,7 @@ import { useContext, createContext } from "react";
 const AppContextState = createContext();
 
 // State context consumer hook
-const useAppContextState = () => {
+const useAppContext = () => {
   const context = useContext(AppContextState);
 
   if (context === undefined) {
@@ -14,4 +14,4 @@ const useAppContextState = () => {
   return context;
 };
 
-export { AppContextState, useAppContextState };
+export { AppContextState, useAppContext };

@@ -1,10 +1,29 @@
-import { Register } from "./pages";
+import { Register, ProtectedRoute, Error } from "./pages";
+import { SharedLayout, Profile, Dashboard, NewTicket } from "./pages/internal";
 import { AppContextProvider } from "./context";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 const App = () => {
   return (
     <AppContextProvider>
-      <Register />
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <SharedLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Dashboard />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="new-ticket" element={<NewTicket />} />
+          </Route>
+          <Route path="register" element={<Register />} />
+          <Route path="*" element={<Error />} />
+        </Routes>
+      </BrowserRouter>
     </AppContextProvider>
   );
 };

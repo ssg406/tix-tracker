@@ -69,7 +69,7 @@ describe("Authorization Routes", () => {
     it("A new user should be created", (done) => {
       chai
         .request(app)
-        .post("/register")
+        .post("api/v1/auth/register")
         .send(completeUser)
         .end((err, res) => {
           res.should.have.status(StatusCodes.CREATED);
@@ -82,7 +82,7 @@ describe("Authorization Routes", () => {
     it("It should send error response with email field missing", (done) => {
       chai
         .request(app)
-        .post("/register")
+        .post("api/v1/auth/register")
         .send(userNoEmail)
         .end((err, res) => {
           res.should.have.status(StatusCodes.BAD_REQUEST);
@@ -95,7 +95,7 @@ describe("Authorization Routes", () => {
     it("It should send error response with password missing", (done) => {
       chai
         .request(app)
-        .post("/register")
+        .post("api/v1/auth/register")
         .send(userNoPassword)
         .end((err, res) => {
           res.should.have.status(StatusCodes.BAD_REQUEST);
@@ -108,7 +108,7 @@ describe("Authorization Routes", () => {
     it("It should send error response with name missing", (done) => {
       chai
         .request(app)
-        .post("/register")
+        .post("api/v1/auth/register")
         .send(userNoName)
         .end((err, res) => {
           res.should.have.status(StatusCodes.BAD_REQUEST);
@@ -122,7 +122,7 @@ describe("Authorization Routes", () => {
       User.create(completeUser);
       chai
         .request(app)
-        .post("/register")
+        .post("api/v1/auth/register")
         .send(completeUser)
         .end((err, res) => {
           res.should.have.status(StatusCodes.CONFLICT);
@@ -135,7 +135,7 @@ describe("Authorization Routes", () => {
     it("Password restrictions should be enforced", (done) => {
       chai
         .request(app)
-        .post("/register")
+        .post("api/v1/auth/register")
         .send(userInvalidPassword)
         .end((err, res) => {
           res.should.have.status(StatusCodes.BAD_REQUEST);
@@ -154,7 +154,7 @@ describe("Authorization Routes", () => {
     it("Successful login should return JWT", (done) => {
       chai
         .request(app)
-        .post("/login")
+        .post("api/v1/auth/login")
         .send(loginValid)
         .end((err, res) => {
           res.should.have.status(StatusCodes.OK);
@@ -169,7 +169,7 @@ describe("Authorization Routes", () => {
     it("Invalid password should return 401 and error message", (done) => {
       chai
         .request(app)
-        .post("/login")
+        .post("api/v1/auth/login")
         .send(loginInvalidPassword)
         .end((err, res) => {
           res.should.have.status(StatusCodes.UNAUTHORIZED);
@@ -182,7 +182,7 @@ describe("Authorization Routes", () => {
     it("Invalid email should return 404 and error message", (done) => {
       chai
         .request(app)
-        .post("/login")
+        .post("api/v1/auth/login")
         .send(loginInvalidEmail)
         .end((err, res) => {
           res.should.have.status(StatusCodes.NOT_FOUND);

@@ -4,6 +4,7 @@ import BadRequestError from "../errors/BadRequestError.js";
 import NotFoundError from "../errors/NotFoundError.js";
 
 const getAllTickets = async (req, res, next) => {
+  console.log(req.userId);
   try {
     const tickets = await Ticket.find({}).populate("createdBy", "name");
     res.status(StatusCodes.OK).json(tickets);

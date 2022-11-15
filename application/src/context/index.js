@@ -1,4 +1,4 @@
 import AppContextProvider from "./AppContextProvider";
-import { AppContextState, useAppContextState } from "./hooks";
+import { AppContextState, useAppContext } from "./hooks";
 
-export { AppContextProvider, AppContextState, useAppContextState };
+export { AppContextProvider, AppContextState, useAppContext };

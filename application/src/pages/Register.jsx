@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Logo from "../assets/logo_svg.svg";
-import { TextInput } from "../components";
+import { TextInput, Alert } from "../components";
+import { useAppContext } from "../context";
 
 const formValues = {
   name: "",
@@ -12,6 +14,8 @@ const formValues = {
 
 const Register = () => {
   const [formState, setFormState] = useState(formValues);
+  const { isLoading, showAlert, registerUser, user } = useAppContext();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormState({ ...formState, [e.target.name]: e.target.value });
@@ -21,18 +25,38 @@ const Register = () => {
     e.preventDefault();
 
     if (formState.isMember) {
-      // Login
+      registerUser({
+        formState,
+        endpoint: "login",
+        alertText: "Signed in successfully!",
+      });
+      setFormState({
+        ...formState,
+        password: "",
+      });
     } else {
-      // Register
+      registerUser({
+        formState,
+        endpoint: "register",
+        alertText: "User registered successfully!",
+      });
+      setFormState({
+        ...formState,
+        password: "",
+        confirm: "",
+      });
     }
-
-    // Clear values at end
-    setFormState(formValues);
   };
 
   const toggleForm = () => {
     setFormState({ ...formState, isMember: !formState.isMember });
   };
+
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
 
   return (
     <div className="md:container md:mx-auto md:max-w-lg p-4 flex flex-col gap-6 items-center justify-center  h-screen">
@@ -40,6 +64,7 @@ const Register = () => {
       <h2 className="text-xl font-bold tracking-tight">
         {formState.isMember ? "Login" : "Create Account"}
       </h2>
+      {showAlert && <Alert />}
       <form className="w-full p-2 flex flex-col gap-6 md:p-8 md:bg-slate-100 md:rounded-xl">
         {!formState.isMember && (
           <TextInput
@@ -70,6 +95,7 @@ const Register = () => {
           />
         )}
         <button
+          disabled={isLoading}
           className="bg-slate-500 focus:bg-slate-800 px-6 py-2 rounded-md font-medium text-white"
           type="submit"
           onClick={handleSubmit}
