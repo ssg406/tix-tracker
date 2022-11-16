@@ -15,6 +15,9 @@ import {
   START_CREATE_TICKET,
   SUCCESS_CREATE_TICKET,
   ERROR_CREATE_TICKET,
+  START_GET_TICKETS,
+  ERROR_GET_TICKETS,
+  SUCCESS_GET_TICKETS,
 } from "./actions";
 
 // Check local storage for saved user and token
@@ -30,6 +33,7 @@ const initialSate = {
   token: token ? token : null,
   isLoading: false,
   showMobileNav: false,
+  tickets: [],
 };
 
 // Context provider
@@ -95,9 +99,9 @@ const AppContextProvider = ({ children }) => {
         email: userDetails.email,
         name: userDetails.name,
       });
-      const { user } = data;
+      const { user, token } = data;
       localStorage.setItem("user", JSON.stringify(user));
-      dispatch({ type: SUCCESS_UPDATE_USER, payload: user });
+      dispatch({ type: SUCCESS_UPDATE_USER, payload: { user, token } });
     } catch (error) {
       dispatch({
         type: ERROR_UPDATE_USER,
@@ -140,6 +144,20 @@ const AppContextProvider = ({ children }) => {
     clearAlert();
   };
 
+  // TODO: get tickets only associated with current user
+  const getAllTickets = async () => {
+    dispatch({ type: START_GET_TICKETS });
+    try {
+      const { data } = await axiosInstance.get("tickets/all");
+      dispatch({ type: SUCCESS_GET_TICKETS, payload: { tickets: data } });
+    } catch (error) {
+      dispatch({
+        type: ERROR_GET_TICKETS,
+        payload: { message: error.response.data.message },
+      });
+    }
+  };
+
   return (
     <AppContextState.Provider
       value={{
@@ -149,6 +167,7 @@ const AppContextProvider = ({ children }) => {
         logoutUser,
         updateUser,
         createTicket,
+        getAllTickets,
       }}
     >
       {children}

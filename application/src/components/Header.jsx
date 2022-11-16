@@ -6,11 +6,11 @@ import { useAppContext } from "../context";
 const Header = () => {
   const { toggleMobileNav } = useAppContext();
   return (
-    <header className="bg-neutral-900 w-full h-20 md:h-32 p-4 flex justify-between items-center">
+    <header className="bg-neutral-900 w-full h-20 md:h-24 p-4 flex justify-between items-center">
       <div>
-        <img src={Logo} alt="Trakr Logo" className="h-10 md:h-16" />
+        <img src={Logo} alt="Trakr Logo" className="h-10 md:h-12" />
       </div>
-      <div>
+      <div className="md:hidden">
         <button onClick={toggleMobileNav}>
           <FiMenu className="text-neutral-300 text-4xl" />
         </button>

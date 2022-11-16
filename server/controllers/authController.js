@@ -67,6 +67,7 @@ const updateUser = async (req, res, next) => {
     user.email = email;
 
     await user.save();
+    const token = user.createToken();
 
     res.status(StatusCodes.OK).json({
       user: {
@@ -75,6 +76,7 @@ const updateUser = async (req, res, next) => {
         email: user.email,
         role: user.role,
       },
+      token: token,
     });
   } catch (error) {
     next(error);

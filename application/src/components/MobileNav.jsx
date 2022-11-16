@@ -9,7 +9,9 @@ const MobileNav = () => {
 
   return (
     <nav
-      className={`w-full bg-slate-200 ${showMobileNav ? "block" : "hidden"}`}
+      className={`w-full bg-slate-200 md:hidden ${
+        showMobileNav ? "block" : "hidden"
+      }`}
     >
       <ul className="font-medium font-heading text-center">
         {navigationLinks.map(({ text, path, id }) => {

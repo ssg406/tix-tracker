@@ -11,6 +11,9 @@ import {
   START_CREATE_TICKET,
   SUCCESS_CREATE_TICKET,
   ERROR_CREATE_TICKET,
+  START_GET_TICKETS,
+  SUCCESS_GET_TICKETS,
+  ERROR_GET_TICKETS,
 } from "./actions";
 
 const reducer = (state, action) => {
@@ -63,7 +66,10 @@ const reducer = (state, action) => {
         ...state,
         isLoading: false,
         showAlert: true,
+        alertType: "success",
         alertText: "User updated successfully",
+        user: action.payload.user,
+        token: action.payload.token,
       };
     case ERROR_UPDATE_USER:
       return {
@@ -87,6 +93,25 @@ const reducer = (state, action) => {
         alertText: "Ticket created successfully!",
       };
     case ERROR_CREATE_TICKET:
+      return {
+        ...state,
+        isLoading: false,
+        showAlert: true,
+        alertType: "danger",
+        alertText: action.payload.message,
+      };
+    case START_GET_TICKETS:
+      return {
+        ...state,
+        isLoading: true,
+      };
+    case SUCCESS_GET_TICKETS:
+      return {
+        ...state,
+        isLoading: false,
+        tickets: action.payload.tickets,
+      };
+    case ERROR_GET_TICKETS:
       return {
         ...state,
         isLoading: false,
