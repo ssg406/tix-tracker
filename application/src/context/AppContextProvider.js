@@ -121,18 +121,17 @@ const AppContextProvider = ({ children }) => {
     dispatch({ type: TOGGLE_MOBILE_NAV });
   };
 
-  const createTicket = ({ date, description }) => {
+  const createTicket = async ({ date, description }) => {
     dispatch({ type: START_CREATE_TICKET });
     const createdBy = state.user.userId;
     try {
-      axiosInstance.post("tickets/new", {
+      const { data } = await axiosInstance.post("tickets/new", {
         date: date,
         createdBy: createdBy,
         description: description,
       });
       dispatch({ type: SUCCESS_CREATE_TICKET });
     } catch (error) {
-      console.log(`THE ERROR WAS ${error.response.data}`);
       dispatch({
         type: ERROR_CREATE_TICKET,
         payload: { message: error.response.data.message },
