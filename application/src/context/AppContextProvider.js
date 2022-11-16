@@ -1,7 +1,7 @@
-import { useMemo, useReducer } from "react";
-import { AppContextState } from "./hooks";
-import reducer from "./reducer";
-import axios from "axios";
+import { useMemo, useReducer } from 'react';
+import { AppContextState } from './hooks';
+import reducer from './reducer';
+import axios from 'axios';
 import {
   START_SETUP_USER,
   SUCCESS_SETUP_USER,
@@ -18,22 +18,25 @@ import {
   START_GET_TICKETS,
   ERROR_GET_TICKETS,
   SUCCESS_GET_TICKETS,
-} from "./actions";
+} from './actions';
 
 // Check local storage for saved user and token
-const token = localStorage.getItem("token");
-const user = localStorage.getItem("user");
+const token = localStorage.getItem('token');
+const user = localStorage.getItem('user');
 
 // Initial application state values
 const initialSate = {
   showAlert: false,
-  alertText: "",
-  alertType: "",
+  alertText: '',
+  alertType: '',
   user: user ? JSON.parse(user) : null,
   token: token ? token : null,
   isLoading: false,
   showMobileNav: false,
   tickets: [],
+  statusFilter: 'all',
+  sortCondition: 'newest',
+  searchText: null,
 };
 
 // Context provider
@@ -42,12 +45,12 @@ const AppContextProvider = ({ children }) => {
 
   // Create Axios instance and set base URL
   const axiosInstance = axios.create({
-    baseURL: "/api/v1",
+    baseURL: '/api/v1',
   });
 
   // Configure auth headers
   if (state.token) {
-    axios.defaults.headers.common["Authorization"] = `Bearer ${state.token}`;
+    axios.defaults.headers.common['Authorization'] = `Bearer ${state.token}`;
   }
 
   // axiosInstance.interceptors.response.use(
@@ -94,13 +97,13 @@ const AppContextProvider = ({ children }) => {
     dispatch({ type: START_UPDATE_USER });
     console.log(userDetails);
     try {
-      const { data } = await axiosInstance.patch("auth/updateUser", {
+      const { data } = await axiosInstance.patch('auth/updateUser', {
         userId: state.user.userId,
         email: userDetails.email,
         name: userDetails.name,
       });
       const { user, token } = data;
-      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem('user', JSON.stringify(user));
       dispatch({ type: SUCCESS_UPDATE_USER, payload: { user, token } });
     } catch (error) {
       dispatch({
@@ -112,13 +115,13 @@ const AppContextProvider = ({ children }) => {
   };
 
   const addUserToLocalStorage = ({ user, token }) => {
-    localStorage.setItem("user", JSON.stringify(user));
-    localStorage.setItem("token", token);
+    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('token', token);
   };
 
   const removeUserFromLocalStorage = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
   };
 
   const toggleMobileNav = () => {
@@ -129,7 +132,7 @@ const AppContextProvider = ({ children }) => {
     dispatch({ type: START_CREATE_TICKET });
     const createdBy = state.user.userId;
     try {
-      const { data } = await axiosInstance.post("tickets/new", {
+      const { data } = await axiosInstance.post('tickets/new', {
         date: date,
         createdBy: createdBy,
         description: description,
@@ -146,9 +149,13 @@ const AppContextProvider = ({ children }) => {
 
   // TODO: get tickets only associated with current user
   const getAllTickets = async () => {
+    let url = `tickets/all?status=${state.statusFilter}&sort=${state.sortCondition}`;
+    if (state.searchText) {
+      url = url + `&search=${state.searchText}`;
+    }
     dispatch({ type: START_GET_TICKETS });
     try {
-      const { data } = await axiosInstance.get("tickets/all");
+      const { data } = await axiosInstance.get('tickets/all');
       dispatch({ type: SUCCESS_GET_TICKETS, payload: { tickets: data } });
     } catch (error) {
       dispatch({
