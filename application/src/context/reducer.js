@@ -14,7 +14,10 @@ import {
   START_GET_TICKETS,
   SUCCESS_GET_TICKETS,
   ERROR_GET_TICKETS,
-} from "./actions";
+  START_EDIT_TICKET,
+  SUCCESS_EDIT_TICKET,
+  ERROR_EDIT_TICKET,
+} from './actions';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -37,7 +40,7 @@ const reducer = (state, action) => {
         ...state,
         isLoading: false,
         showAlert: true,
-        alerType: "danger",
+        alerType: 'danger',
         alertText: action.payload.message,
       };
     case LOGOUT_USER:
@@ -66,8 +69,8 @@ const reducer = (state, action) => {
         ...state,
         isLoading: false,
         showAlert: true,
-        alertType: "success",
-        alertText: "User updated successfully",
+        alertType: 'success',
+        alertText: 'User updated successfully',
         user: action.payload.user,
         token: action.payload.token,
       };
@@ -76,7 +79,7 @@ const reducer = (state, action) => {
         ...state,
         isLoading: false,
         showAlert: true,
-        alertType: "danger",
+        alertType: 'danger',
         alertText: action.payload.message,
       };
     case START_CREATE_TICKET:
@@ -89,15 +92,15 @@ const reducer = (state, action) => {
         ...state,
         isLoading: false,
         showAlert: true,
-        alertType: "success",
-        alertText: "Ticket created successfully!",
+        alertType: 'success',
+        alertText: 'Ticket created successfully!',
       };
     case ERROR_CREATE_TICKET:
       return {
         ...state,
         isLoading: false,
         showAlert: true,
-        alertType: "danger",
+        alertType: 'danger',
         alertText: action.payload.message,
       };
     case START_GET_TICKETS:
@@ -116,11 +119,38 @@ const reducer = (state, action) => {
         ...state,
         isLoading: false,
         showAlert: true,
-        alertType: "danger",
+        alertType: 'danger',
+        alertText: action.payload.message,
+      };
+    case START_EDIT_TICKET:
+      return {
+        ...state,
+        isLoading: true,
+        isEditingTicket: true,
+        editingTicketId: action.payload.ticketId,
+      };
+    case SUCCESS_EDIT_TICKET:
+      return {
+        ...state,
+        isLoading: false,
+        isEditingTicket: false,
+        editingTicketId: null,
+        showAlert: true,
+        alertType: 'success',
+        alertText: 'Ticket edit successfully!',
+      };
+    case ERROR_EDIT_TICKET:
+      return {
+        ...state,
+        isLoading: false,
+        isEditingTicket: false,
+        editingTicketId: null,
+        showAlert: true,
+        alerType: 'danger',
         alertText: action.payload.message,
       };
     default:
-      throw new Error("Invalid argument to reducer");
+      throw new Error('Invalid argument to reducer');
   }
 };
 

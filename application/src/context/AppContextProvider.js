@@ -1,4 +1,4 @@
-import { useMemo, useReducer } from 'react';
+import { useReducer } from 'react';
 import { AppContextState } from './hooks';
 import reducer from './reducer';
 import axios from 'axios';
@@ -37,6 +37,8 @@ const initialSate = {
   statusFilter: 'all',
   sortCondition: 'newest',
   searchText: null,
+  isEditingTicket: false,
+  editingTicketId: null,
 };
 
 // Context provider
@@ -155,7 +157,7 @@ const AppContextProvider = ({ children }) => {
     }
     dispatch({ type: START_GET_TICKETS });
     try {
-      const { data } = await axiosInstance.get('tickets/all');
+      const { data } = await axiosInstance.get(url);
       dispatch({ type: SUCCESS_GET_TICKETS, payload: { tickets: data } });
     } catch (error) {
       dispatch({
@@ -164,6 +166,8 @@ const AppContextProvider = ({ children }) => {
       });
     }
   };
+
+  const editTicket = async () => {};
 
   return (
     <AppContextState.Provider

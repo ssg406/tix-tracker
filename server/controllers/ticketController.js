@@ -1,16 +1,42 @@
-import Ticket from "../models/Ticket.js";
-import StatusCodes from "http-status-codes";
-import BadRequestError from "../errors/BadRequestError.js";
-import NotFoundError from "../errors/NotFoundError.js";
+import Ticket from '../models/Ticket.js';
+import StatusCodes from 'http-status-codes';
+import {
+  BadRequestError,
+  NotFoundError,
+  AuthorizationError,
+} from '../errors/index.js';
 
 const getAllTickets = async (req, res, next) => {
-  console.log(req.userId);
-  try {
-    const tickets = await Ticket.find({}).populate("createdBy", "name");
-    res.status(StatusCodes.OK).json(tickets);
-  } catch (error) {
-    next(error);
+  const { status, sort, search } = req.query;
+
+  const queryObject = {
+    createdBy: req.userId,
+  };
+
+  if (status && status !== 'all') {
+    queryObject.status = status;
   }
+
+  if (search) {
+    queryObject.description = { $regex: search, $options: 'i' };
+  }
+
+  let sortString;
+  if (sort === 'oldest') {
+    sortString = 'date';
+  } else if (sort === 'newest') {
+    sortString = '-date';
+  }
+
+  Ticket.find(queryObject)
+    .sort(sortString)
+    .exec(function (err, result) {
+      if (err) {
+        next(err);
+      } else {
+        res.status(StatusCodes.OK).json(result);
+      }
+    });
 };
 
 const createTicket = async (req, res, next) => {
@@ -34,15 +60,15 @@ const createTicket = async (req, res, next) => {
 const deleteTicket = async (req, res, next) => {
   try {
     const { _id } = req.body;
-    if (!_id) throw new BadRequestError("Please specify a ticket ID");
+    if (!_id) throw new BadRequestError('Please specify a ticket ID');
 
     const ticket = await Ticket.findById(_id);
     if (!ticket)
-      throw new NotFoundError("Could not find a ticket with that ID");
+      throw new NotFoundError('Could not find a ticket with that ID');
     await ticket.deleteOne();
     res.status(StatusCodes.OK).json({
       _id,
-      message: "Ticket deleted",
+      message: 'Ticket deleted',
     });
   } catch (error) {
     next(error);
@@ -52,10 +78,15 @@ const deleteTicket = async (req, res, next) => {
 const updateTicket = async (req, res, next) => {
   try {
     const { _id, description, status } = req.body;
-    if (!_id) throw new BadRequestError("Please specify a ticket ID");
+    if (!_id) throw new BadRequestError('Please specify a ticket ID');
     const ticket = await Ticket.findById(_id);
     if (!ticket) {
-      throw new NotFoundError("Could not find a ticket with that ID");
+      throw new NotFoundError('Could not find a ticket with that ID');
+    }
+    if (ticket._id !== req.userId) {
+      throw new AuthorizationError(
+        'You are not authorized to modify this ticket'
+      );
     }
     ticket.description = description || ticket.description;
     ticket.status = status || ticket.status;
