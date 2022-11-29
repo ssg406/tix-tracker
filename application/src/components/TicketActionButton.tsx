@@ -1,4 +1,11 @@
-const TicketActionButton = ({ handleClick, buttonText }) => {
+import React, { MouseEventHandler } from 'react';
+
+type Props = {
+  handleClick?: MouseEventHandler,
+  buttonText: String,
+};
+
+const TicketActionButton = ({ handleClick, buttonText }: Props) => {
   return (
     <button
       onClick={handleClick}

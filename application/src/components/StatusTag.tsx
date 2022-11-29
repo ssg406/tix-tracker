@@ -1,5 +1,9 @@
-const StatusTag = ({ status }) => {
-  let tagBackground;
+type Props = {
+  status: string,
+}
+
+const StatusTag = ({ status }: Props) => {
+  let tagBackground: string;
   if (status === "open") {
     tagBackground = "bg-slate-400";
   } else if (status === "closed") {

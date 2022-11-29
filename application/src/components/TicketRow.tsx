@@ -1,9 +1,15 @@
 import StatusTag from './StatusTag';
 import { GrMore } from 'react-icons/gr';
 import { useState } from 'react';
-import { TicketActionButton } from '../components';
+import { TicketActionButton } from '.';
 
-const TicketRow = ({ status, description, ticketId }) => {
+type Props = {
+  status: string,
+  description: string,
+  ticketId?: number,
+}
+
+const TicketRow = ({ status, description, ticketId }: Props) => {
   const [showOptions, setShowOptions] = useState(false);
 
   return (

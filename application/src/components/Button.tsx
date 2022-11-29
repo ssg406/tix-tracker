@@ -1,6 +1,11 @@
-import React from "react";
+import React, {MouseEventHandler} from "react";
 
-const Button = ({ text, handleClick }) => {
+type Props = {
+  handleClick: MouseEventHandler,
+  text: string,
+}
+
+const Button = ({handleClick, text}: Props) => {
   return (
     <button
       onClick={handleClick}

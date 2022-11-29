@@ -31,6 +31,7 @@ const reducer = (state, action) => {
         ...state,
         isLoading: false,
         showAlert: true,
+        alertType: 'success',
         alertText: action.payload.alertText,
         user: action.payload.user,
         token: action.payload.token,
@@ -40,7 +41,7 @@ const reducer = (state, action) => {
         ...state,
         isLoading: false,
         showAlert: true,
-        alerType: 'danger',
+        alertType: 'danger',
         alertText: action.payload.message,
       };
     case LOGOUT_USER:
@@ -53,6 +54,7 @@ const reducer = (state, action) => {
       return {
         ...state,
         showAlert: false,
+        alertType: '',
       };
     case TOGGLE_MOBILE_NAV:
       return {
