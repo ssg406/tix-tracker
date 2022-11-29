@@ -41,7 +41,7 @@ const reducer = (state, action) => {
         ...state,
         isLoading: false,
         showAlert: true,
-        alertType: 'danger',
+        alertType: 'error',
         alertText: action.payload.message,
       };
     case LOGOUT_USER:
@@ -81,7 +81,7 @@ const reducer = (state, action) => {
         ...state,
         isLoading: false,
         showAlert: true,
-        alertType: 'danger',
+        alertType: 'error',
         alertText: action.payload.message,
       };
     case START_CREATE_TICKET:
@@ -102,7 +102,7 @@ const reducer = (state, action) => {
         ...state,
         isLoading: false,
         showAlert: true,
-        alertType: 'danger',
+        alertType: 'error',
         alertText: action.payload.message,
       };
     case START_GET_TICKETS:
@@ -121,7 +121,7 @@ const reducer = (state, action) => {
         ...state,
         isLoading: false,
         showAlert: true,
-        alertType: 'danger',
+        alertType: 'error',
         alertText: action.payload.message,
       };
     case START_EDIT_TICKET:
@@ -148,7 +148,7 @@ const reducer = (state, action) => {
         isEditingTicket: false,
         editingTicketId: null,
         showAlert: true,
-        alerType: 'danger',
+        alerType: 'error',
         alertText: action.payload.message,
       };
     default:
