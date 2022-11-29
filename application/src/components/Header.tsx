@@ -2,6 +2,7 @@ import React from "react";
 import Logo from "../assets/logo_light.svg";
 import { FiMenu } from "react-icons/fi";
 import { useAppContext } from "../context";
+import { Drawer } from '@mui/material';
 
 const Header = () => {
   const { toggleMobileNav } = useAppContext();

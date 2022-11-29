@@ -1,7 +1,6 @@
 import { useState, useEffect, ChangeEvent, MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../assets/logo_svg.svg';
-// import { Alert } from '../components';
 import { useAppContext } from '../context';
 import { Button, TextField, Alert } from '@mui/material';
 
@@ -11,6 +10,8 @@ const formValues = {
   password: '',
   confirm: '',
   isMember: false,
+  formError: false,
+  formErrorMessage: '',
 };
 
 const Register = () => {
@@ -19,13 +20,14 @@ const Register = () => {
   const navigate = useNavigate();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    console.log(typeof e);
+    // Set formState using dynamic key from event
     setFormState({ ...formState, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = (e: MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
 
+    // Call async function with either /login or /register endpoint
     if (formState.isMember) {
       registerUser({
         formState,
@@ -50,20 +52,31 @@ const Register = () => {
     }
   };
 
+  // Toggles form between login and register modes
   const toggleForm = () => {
     setFormState({ ...formState, isMember: !formState.isMember });
   };
 
+  // Navigate to root if user exists in context
   useEffect(() => {
     if (user) {
       navigate('/');
     }
   }, [user, navigate]);
 
+  // Monitor password confirm field for match validation
+  useEffect(() => {
+    if (formState.password !== formState.confirm && (formState.password.length > 5 && formState.confirm.length > 5)) {
+      setFormState({...formState, formError: true, formErrorMessage: 'Passwords do not match'})
+    } else {
+      setFormState({...formState, formError: false, formErrorMessage: ''})
+    }
+  }, [formState.password, formState.confirm])
+
   return (
     <div className='md:container md:mx-auto md:max-w-lg p-4 flex flex-col gap-6 items-center justify-center  h-screen'>
       <img className='h-16 md:h-24' src={Logo} alt='trakr logo' />
-      <h2 className='text-xl font-bold tracking-tight'>
+      <h2 className='text-xl font-medium tracking-tight'>
         {formState.isMember ? 'Login' : 'Create Account'}
       </h2>
       {showAlert && <Alert severity={alertType}>{alertText}</Alert>}
@@ -95,18 +108,21 @@ const Register = () => {
           label='Password'
           value={formState.password}
           onChange={handleChange}
+          error={formState.formError}
         />
         {!formState.isMember && (
           <TextField
             variant='standard'
             name='confirm'
             type='password'
+            error={formState.formError}
             label='Confirm Password'
             value={formState.confirm}
             onChange={handleChange}
+            helperText={formState.formError && formState.formErrorMessage}
           />
         )}
-        <Button variant='contained' onClick={handleSubmit}>
+        <Button variant='contained' type='submit' onClick={handleSubmit} disabled={isLoading}>
           {formState.isMember ? 'Login' : 'Register'}
         </Button>
       </form>

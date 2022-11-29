@@ -1,15 +1,14 @@
-import { Button, Alert } from "../../components";
-import { useAppContext } from "../../context";
-import React, { useState } from "react";
-import DatePicker from "react-date-picker";
+import { useAppContext } from '../../context';
+import React, { useState } from 'react';
+import { Alert, Button, TextField } from '@mui/material';
 
 const initialFormValues = {
-  date: "",
-  description: "",
+  date: '',
+  description: '',
 };
 
 const NewTicket = () => {
-  const { showAlert, createTicket } = useAppContext();
+  const { showAlert, createTicket, alertType, alertText } = useAppContext();
 
   const [formValues, setFormValues] = useState(initialFormValues);
 
@@ -26,31 +25,29 @@ const NewTicket = () => {
   };
 
   return (
-    <main className="p-4">
-      <h2 className="text-xl font-bold tracking-tight mb-6">Create Ticket</h2>
-      {showAlert && <Alert />}
-      <form className="flex flex-col gap-4">
-        <label className="font-medium" htmlFor="date">
-          Date
-        </label>
-        <input
-          type="date"
-          name="date"
-          className="bg-neutral-200 ring-2 ring-neutral-300 px-4 py-2 rounded-tr-xl rounded-bl-xl focus:outline-0 focus:ring-neutral-400"
+    <main className='p-4'>
+      <h2 className='text-xl font-bold tracking-tight mb-6'>Create Ticket</h2>
+      {showAlert && <Alert severity={alertType}>{alertText}</Alert>}
+      <form className='flex flex-col gap-4'>
+        <TextField
+          label='Date'
+          type='date'
+          name='date'
           onChange={handleChange}
+          variant='standard'
         />
-        <label className="font-medium" htmlFor="description">
-          Description
-        </label>
-        <textarea
+        <TextField
+          type='text'
+          label='Description'
+          variant='filled'
           onChange={handleChange}
-          id="description"
-          name="description"
-          rows="6"
-          placeholder="Please enter a brief description of the issue"
-          className="bg-neutral-200 rounded-tr-xl rounded-bl-xl ring-2 ring-neutral-300 focus:outline-0 focus:ring-neutral-400 px-4 py-2 resize-none"
-        ></textarea>
-        <Button text="Submit Ticket" handleClick={handleSubmit} />
+          placeholder='Please enter a short description of the issue'
+          multiline
+          minRows={6}
+        />
+        <Button type='submit' variant='contained' onClick={handleSubmit}>
+          Submit Ticket
+        </Button>
       </form>
     </main>
   );
