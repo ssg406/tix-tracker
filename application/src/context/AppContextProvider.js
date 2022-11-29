@@ -55,15 +55,18 @@ const AppContextProvider = ({ children }) => {
     axios.defaults.headers.common['Authorization'] = `Bearer ${state.token}`;
   }
 
-  // axiosInstance.interceptors.response.use(
-  //   (response) => {
-  //     return response;
-  //   },
-  //   (error) => {
-  //     console.log(error.response.data);
-  //     return Promise.reject(error);
-  //   }
-  // );
+  axiosInstance.interceptors.response.use(
+    (response) => {
+      return response;
+    },
+    (error) => {
+      if (error.response.status === 401) {
+        clearAlert();
+        logoutUser();
+      }
+      return Promise.reject(error);
+    }
+  );
 
   const clearAlert = () => {
     setTimeout(() => {
@@ -113,6 +116,7 @@ const AppContextProvider = ({ children }) => {
         payload: { message: error.response.data.message },
       });
     }
+
     clearAlert();
   };
 
@@ -141,6 +145,8 @@ const AppContextProvider = ({ children }) => {
       });
       dispatch({ type: SUCCESS_CREATE_TICKET });
     } catch (error) {
+      logoutUser();
+
       dispatch({
         type: ERROR_CREATE_TICKET,
         payload: { message: error.response.data.message },
