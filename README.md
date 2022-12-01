@@ -1,4 +1,4 @@
-# Tix - Ticket Tracker
+# Trakr - Ticket Tracker
 
 ## Description
 
