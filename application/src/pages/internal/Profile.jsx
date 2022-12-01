@@ -22,7 +22,7 @@ const Profile = () => {
     updateUser(formValues);
   };
   return (
-    <main className='p-4'>
+    <main className='p-4 md:container md:mx-auto'>
       <h2 className='text-xl font-bold tracking-tight mb-6'>
         Account Information
       </h2>

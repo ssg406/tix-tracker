@@ -21,6 +21,10 @@ import {
   START_CANCEL_TICKET,
   ERROR_CANCEL_TICKET,
   SUCCESS_CANCEL_TICKET,
+  START_EDIT_TICKET,
+  ERROR_EDIT_TICKET,
+  SUCCESS_EDIT_TICKET,
+  SET_EDIT_TICKET,
 } from './actions';
 
 // Check local storage for saved user and token
@@ -41,7 +45,10 @@ const initialSate = {
   sortCondition: 'newest',
   searchText: null,
   isEditingTicket: false,
-  editingTicketId: null,
+  editTicketId: '',
+  date: '',
+  status: '',
+  description: '',
 };
 
 // Context provider
@@ -175,7 +182,26 @@ const AppContextProvider = ({ children }) => {
     clearAlert();
   };
 
-  const editTicket = async () => {};
+  const setEditTicket = (id) => {
+    dispatch({ type: SET_EDIT_TICKET, payload: { id } });
+  };
+
+  const editTicket = async ({ _id, date, description }) => {
+    dispatch({ type: START_EDIT_TICKET });
+    try {
+      await axiosInstance.patch('tickets/update', {
+        _id,
+        date,
+        description,
+      });
+      dispatch({ type: SUCCESS_EDIT_TICKET });
+    } catch (error) {
+      dispatch({
+        type: ERROR_EDIT_TICKET,
+        payload: { message: error.response.data.message },
+      });
+    }
+  };
 
   const cancelTicket = async ({ ticketId }) => {
     dispatch({ type: START_CANCEL_TICKET });
@@ -202,8 +228,9 @@ const AppContextProvider = ({ children }) => {
         updateUser,
         createTicket,
         getAllTickets,
-        editTicket,
+        setEditTicket,
         cancelTicket,
+        editTicket,
       }}
     >
       {children}

@@ -20,6 +20,7 @@ import {
   START_CANCEL_TICKET,
   SUCCESS_CANCEL_TICKET,
   ERROR_CANCEL_TICKET,
+  SET_EDIT_TICKET,
 } from './actions';
 
 const reducer = (state, action) => {
@@ -127,32 +128,48 @@ const reducer = (state, action) => {
         alertType: 'error',
         alertText: action.payload.message,
       };
+    case SET_EDIT_TICKET:
+      const ticket = state.tickets.find(
+        (ticket) => ticket._id === action.payload.id
+      );
+      const { date, status, description } = ticket;
+      return {
+        ...state,
+        isEditingTicket: true,
+        editingTicketId: action.payload.id,
+        date,
+        status,
+        description,
+      };
     case START_EDIT_TICKET:
       return {
         ...state,
         isLoading: true,
-        isEditingTicket: true,
-        editingTicketId: action.payload.ticketId,
       };
     case SUCCESS_EDIT_TICKET:
       return {
         ...state,
         isLoading: false,
-        isEditingTicket: false,
         editingTicketId: null,
         showAlert: true,
         alertType: 'success',
-        alertText: 'Ticket edit successfully!',
+        alertText: 'Ticket edited successfully!',
+        date: '',
+        status: '',
+        description: '',
       };
     case ERROR_EDIT_TICKET:
       return {
         ...state,
         isLoading: false,
         isEditingTicket: false,
-        editingTicketId: null,
+        editingTicket: null,
         showAlert: true,
         alerType: 'error',
         alertText: action.payload.message,
+        date: '',
+        status: '',
+        description: '',
       };
     case START_CANCEL_TICKET:
       return {

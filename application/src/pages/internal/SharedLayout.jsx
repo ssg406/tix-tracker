@@ -1,6 +1,6 @@
-import React from "react";
-import { Outlet } from "react-router-dom";
-import { Footer, FullNav, Header, MobileNav } from "../../components";
+import React from 'react';
+import { Outlet } from 'react-router-dom';
+import { Footer, FullNav, Header, MobileNav } from '../../components';
 
 const SharedLayout = () => {
   //Sidebars

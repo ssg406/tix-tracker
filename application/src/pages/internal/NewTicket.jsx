@@ -1,5 +1,6 @@
 import { useAppContext } from '../../context';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
 import { Alert, Button, TextField } from '@mui/material';
 
 const initialFormValues = {
@@ -8,15 +9,35 @@ const initialFormValues = {
 };
 
 const NewTicket = () => {
-  const { showAlert, createTicket, alertType, alertText } = useAppContext();
+  const {
+    showAlert,
+    createTicket,
+    alertType,
+    alertText,
+    isEditingTicket,
+    editingTicketId,
+    date,
+    status,
+    description,
+    editTicket,
+  } = useAppContext();
 
   const [formValues, setFormValues] = useState(initialFormValues);
 
+  // Submit new ticket form
   const handleSubmit = (e) => {
     e.preventDefault();
-    createTicket(formValues);
+    if (!isEditingTicket) {
+      createTicket(formValues);
+    } else {
+      editTicket({
+        _id: editingTicketId,
+        date: formValues.date,
+        description: formValues.description,
+      });
+    }
   };
-
+  // Write to form state on change
   const handleChange = (e) => {
     setFormValues({
       ...formValues,
@@ -25,8 +46,10 @@ const NewTicket = () => {
   };
 
   return (
-    <main className='p-4'>
-      <h2 className='text-xl font-bold tracking-tight mb-6'>Create Ticket</h2>
+    <main className='p-4 md:container md:mx-auto'>
+      <h2 className='text-xl font-bold tracking-tight mb-6'>
+        {isEditingTicket ? 'Edit Ticket' : 'Create Ticket'}
+      </h2>
       {showAlert && (
         <Alert
           sx={{ marginTop: '20px', marginBottom: '20px' }}
@@ -53,7 +76,7 @@ const NewTicket = () => {
           minRows={6}
         />
         <Button type='submit' variant='contained' onClick={handleSubmit}>
-          Submit Ticket
+          {isEditingTicket ? 'Update Ticket' : 'Submit Ticket'}
         </Button>
       </form>
     </main>

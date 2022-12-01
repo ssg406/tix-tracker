@@ -1,6 +1,7 @@
 import StatusTag from './StatusTag';
 import { format } from 'date-fns';
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context';
 import {
   Menu,
@@ -27,11 +28,17 @@ type Props = {
 const TicketRow = ({ status, description, ticketId, date }: Props) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);
-  const { cancelTicket } = useAppContext();
+  const { cancelTicket, setEditTicket } = useAppContext();
   const dateObj = new Date(date);
+  const navigate = useNavigate();
 
   const handleCancelTicket = () => {
     cancelTicket({ ticketId });
+  };
+
+  const handleEditTicket = () => {
+    setEditTicket(ticketId);
+    navigate('new-ticket');
   };
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -70,7 +77,7 @@ const TicketRow = ({ status, description, ticketId, date }: Props) => {
             anchorEl={anchorEl}
             open={menuOpen}
             onClose={handleClose}
-            onEditClick={handleClose}
+            onEditClick={handleEditTicket}
             onCancelClick={handleDialogOpen}
           />
 
