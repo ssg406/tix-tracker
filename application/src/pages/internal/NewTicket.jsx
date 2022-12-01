@@ -27,10 +27,16 @@ const NewTicket = () => {
   return (
     <main className='p-4'>
       <h2 className='text-xl font-bold tracking-tight mb-6'>Create Ticket</h2>
-      {showAlert && <Alert severity={alertType}>{alertText}</Alert>}
+      {showAlert && (
+        <Alert
+          sx={{ marginTop: '20px', marginBottom: '20px' }}
+          severity={alertType}
+        >
+          {alertText}
+        </Alert>
+      )}
       <form className='flex flex-col gap-4'>
         <TextField
-          label='Date'
           type='date'
           name='date'
           onChange={handleChange}

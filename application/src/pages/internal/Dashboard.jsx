@@ -9,7 +9,14 @@ const Dashboard = () => {
     <main className='md:container md:mx-auto p-4'>
       <h2 className='text-xl font-bold tracking-tight'>Dashboard</h2>
       <h3>Welcome {user.name}</h3>
-      {showAlert && <Alert severity={alertType}>{alertText}</Alert>}
+      {showAlert && (
+        <Alert
+          sx={{ marginTop: '20px', marginBottom: '20px' }}
+          severity={alertType}
+        >
+          {alertText}
+        </Alert>
+      )}
       <TicketsContainer />
     </main>
   );

@@ -14,6 +14,8 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import useConfirmationDialog from '../hooks/useConfirmationDialog';
+import ConfirmationDialog from './ConfirmationDialog';
 
 const navigationLinks = [
   {
@@ -38,6 +40,9 @@ const navigationLinks = [
 
 const MobileNav = () => {
   const { showMobileNav, logoutUser, toggleMobileNav } = useAppContext();
+
+  const { dialogOpen, handleDialogOpen, handleDialogClose } =
+    useConfirmationDialog(logoutUser, toggleMobileNav);
 
   return (
     <nav>
@@ -69,11 +74,19 @@ const MobileNav = () => {
               <ListItemIcon>
                 <LogoutIcon />
               </ListItemIcon>
-              <ListItemText onClick={logoutUser}>Logout</ListItemText>
+              <ListItemText onClick={handleDialogOpen}>Logout</ListItemText>
             </ListItemButton>
           </ListItem>
         </List>
       </Drawer>
+      <ConfirmationDialog
+        open={dialogOpen}
+        onClose={() => handleDialogClose(false)}
+        dialogTitle='Logout'
+        dialogText='Are you sure you want to logout?'
+        onConfirmClick={() => handleDialogClose(true)}
+        onCancelClick={() => handleDialogClose(false)}
+      />
     </nav>
   );
 };

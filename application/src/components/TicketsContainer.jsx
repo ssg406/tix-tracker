@@ -17,13 +17,14 @@ const TicketsContainer = () => {
           No tickets found
         </h3>
       ) : (
-        tickets.map(({ _id, description, status }) => {
+        tickets.map(({ _id, description, status, date }) => {
           return (
             <TicketRow
               key={_id}
               description={description}
               status={status}
               ticketId={_id}
+              date={date}
             />
           );
         })
