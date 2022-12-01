@@ -1,4 +1,4 @@
-import Ticket from '../models/Ticket.js';
+import Ticket, { TicketStatus } from '../models/Ticket.js';
 import StatusCodes from 'http-status-codes';
 import {
   BadRequestError,
@@ -59,15 +59,14 @@ const createTicket = async (req, res, next) => {
 
 const deleteTicket = async (req, res, next) => {
   try {
-    const { _id } = req.body;
-    if (!_id) throw new BadRequestError('Please specify a ticket ID');
-
-    const ticket = await Ticket.findById(_id);
-    if (!ticket)
-      throw new NotFoundError('Could not find a ticket with that ID');
+    const { ticketId } = req.params;
+    if (!ticketId) {
+      throw new BadRequestError('Please provide a ticket ID');
+    }
+    const ticket = await getTicket(next, ticketId);
     await ticket.deleteOne();
     res.status(StatusCodes.OK).json({
-      _id,
+      ticketId,
       message: 'Ticket deleted',
     });
   } catch (error) {
@@ -79,10 +78,7 @@ const updateTicket = async (req, res, next) => {
   try {
     const { _id, description, status } = req.body;
     if (!_id) throw new BadRequestError('Please specify a ticket ID');
-    const ticket = await Ticket.findById(_id);
-    if (!ticket) {
-      throw new NotFoundError('Could not find a ticket with that ID');
-    }
+    const ticket = await getTicket(next, _id);
     if (ticket._id !== req.userId) {
       throw new AuthorizationError(
         'You are not authorized to modify this ticket'
@@ -97,4 +93,37 @@ const updateTicket = async (req, res, next) => {
   }
 };
 
-export { createTicket, deleteTicket, updateTicket, getAllTickets };
+const cancelTicket = async (req, res, next) => {
+  try {
+    const { ticketId } = req.params;
+    if (!ticketId) {
+      throw new BadRequestError('Please provide a ticket ID');
+    }
+    const ticket = await getTicket(next, ticketId);
+    ticket.status = TicketStatus.Cancelled;
+    await ticket.save();
+    res.json({ ticket });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getTicket = async (next, ticketId) => {
+  try {
+    const ticket = await Ticket.findById(ticketId);
+    if (!ticket) {
+      throw new NotFoundError('Could not locate a ticket with that ID');
+    }
+    return ticket;
+  } catch (error) {
+    next(error);
+  }
+};
+
+export {
+  createTicket,
+  deleteTicket,
+  updateTicket,
+  getAllTickets,
+  cancelTicket,
+};

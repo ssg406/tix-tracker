@@ -17,6 +17,9 @@ import {
   START_EDIT_TICKET,
   SUCCESS_EDIT_TICKET,
   ERROR_EDIT_TICKET,
+  START_CANCEL_TICKET,
+  SUCCESS_CANCEL_TICKET,
+  ERROR_CANCEL_TICKET,
 } from './actions';
 
 const reducer = (state, action) => {
@@ -149,6 +152,27 @@ const reducer = (state, action) => {
         editingTicketId: null,
         showAlert: true,
         alerType: 'error',
+        alertText: action.payload.message,
+      };
+    case START_CANCEL_TICKET:
+      return {
+        ...state,
+        isLoading: true,
+      };
+    case SUCCESS_CANCEL_TICKET:
+      return {
+        ...state,
+        isLoading: false,
+        showAlert: true,
+        alertType: 'success',
+        alertText: 'Ticket cancelled successfully',
+      };
+    case ERROR_CANCEL_TICKET:
+      return {
+        ...state,
+        isLoading: false,
+        showAlert: true,
+        alertType: 'error',
         alertText: action.payload.message,
       };
     default:

@@ -18,6 +18,9 @@ import {
   START_GET_TICKETS,
   ERROR_GET_TICKETS,
   SUCCESS_GET_TICKETS,
+  START_CANCEL_TICKET,
+  ERROR_CANCEL_TICKET,
+  SUCCESS_CANCEL_TICKET,
 } from './actions';
 
 // Check local storage for saved user and token
@@ -145,8 +148,6 @@ const AppContextProvider = ({ children }) => {
       });
       dispatch({ type: SUCCESS_CREATE_TICKET });
     } catch (error) {
-      logoutUser();
-
       dispatch({
         type: ERROR_CREATE_TICKET,
         payload: { message: error.response.data.message },
@@ -171,9 +172,25 @@ const AppContextProvider = ({ children }) => {
         payload: { message: error.response.data.message },
       });
     }
+    clearAlert();
   };
 
   const editTicket = async () => {};
+
+  const cancelTicket = async ({ ticketId }) => {
+    dispatch({ type: START_CANCEL_TICKET });
+    const url = `tickets/cancel/${ticketId}`;
+    try {
+      await axiosInstance.patch(url);
+      dispatch({ type: SUCCESS_CANCEL_TICKET });
+    } catch (error) {
+      dispatch({
+        type: ERROR_CANCEL_TICKET,
+        payload: { message: error.response.data.message },
+      });
+    }
+    clearAlert();
+  };
 
   return (
     <AppContextState.Provider
@@ -185,6 +202,8 @@ const AppContextProvider = ({ children }) => {
         updateUser,
         createTicket,
         getAllTickets,
+        editTicket,
+        cancelTicket,
       }}
     >
       {children}

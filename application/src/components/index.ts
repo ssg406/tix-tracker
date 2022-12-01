@@ -1,4 +1,3 @@
-import TextInput from './TextInput';
 import Footer from './Footer';
 import FullNav from './FullNav';
 import Header from './Header';
@@ -8,10 +7,9 @@ import Button from './Button';
 import Alert from './Alert';
 import TicketRow from './TicketRow';
 import StatusTag from './StatusTag';
-import TicketActionButton from './TicketActionButton';
+import TicketsContainer from './TicketsContainer';
 
 export {
-  TextInput,
   Footer,
   FullNav,
   Header,
@@ -21,5 +19,5 @@ export {
   Alert,
   TicketRow,
   StatusTag,
-  TicketActionButton,
+  TicketsContainer,
 };

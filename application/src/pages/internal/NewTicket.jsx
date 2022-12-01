@@ -37,6 +37,7 @@ const NewTicket = () => {
           variant='standard'
         />
         <TextField
+          name='description'
           type='text'
           label='Description'
           variant='filled'

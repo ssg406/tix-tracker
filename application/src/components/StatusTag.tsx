@@ -1,27 +1,20 @@
+import { Chip } from '@mui/material';
+
 type Props = {
-  status: string,
-}
+  status: string;
+};
 
 const StatusTag = ({ status }: Props) => {
-  let tagBackground: string;
-  if (status === "open") {
-    tagBackground = "bg-slate-400";
-  } else if (status === "closed") {
-    tagBackground = "bg-cyan-500";
-  } else if (status === "cancelled") {
-    tagBackground = "bg-red-500";
-  } else if (status === "in-progress") {
-    tagBackground = "bg-green-400";
-  } else {
-    tagBackground = "bg-white";
-  }
-  return (
-    <div
-      className={`${tagBackground} text-center py-1 px-2 rounded-full font-bold uppercase text-neutral-800`}
-    >
-      {status}
-    </div>
-  );
+  const statusMap: Record<string, string> = {
+    open: 'info',
+    closed: 'success',
+    cancelled: 'warning',
+    'in-progress': 'info',
+  };
+
+  const statusLabel = status.toUpperCase();
+
+  return <Chip label={statusLabel} color={statusMap[status]} />;
 };
 
 export default StatusTag;
