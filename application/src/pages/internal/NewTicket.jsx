@@ -1,6 +1,6 @@
 import { useAppContext } from '../../context';
 import React, { useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Alert, Button, TextField } from '@mui/material';
 
 const initialFormValues = {
@@ -15,14 +15,19 @@ const NewTicket = () => {
     alertType,
     alertText,
     isEditingTicket,
-    editingTicketId,
+    editTicketId,
     date,
     status,
     description,
-    editTicket,
   } = useAppContext();
 
+  const navigate = useNavigate();
+
   const [formValues, setFormValues] = useState(initialFormValues);
+
+  if (isEditingTicket) {
+    console.log({ editTicketId, date, status, description });
+  }
 
   // Submit new ticket form
   const handleSubmit = (e) => {
@@ -30,12 +35,9 @@ const NewTicket = () => {
     if (!isEditingTicket) {
       createTicket(formValues);
     } else {
-      editTicket({
-        _id: editingTicketId,
-        date: formValues.date,
-        description: formValues.description,
-      });
+      // handle edit ticket case
     }
+    navigate('/');
   };
   // Write to form state on change
   const handleChange = (e) => {

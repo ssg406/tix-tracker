@@ -4,7 +4,7 @@ const currentUser = localStorage.getItem('user');
 const currentToken = localStorage.getItem('token');
 
 // Create Axios instance and set base URL
-const axiosInstance = axios.create({
+const authFetch = axios.create({
   baseURL: '/api/v1',
 });
 
@@ -18,25 +18,30 @@ const addUserToLocalStorage = ({ user, token }) => {
   localStorage.setItem('token', token);
 };
 
-const removeUserFromLocalStorage = () => {
-  localStorage.removeItem('user');
-  localStorage.removeItem('token');
-};
-
 export const registerUser = createAsyncThunk(
   'user/registerUser',
-  async (userObject) => {
+  async (userObject, { rejectWithValue }) => {
     try {
-      const { data } = await axiosInstance.post('auth/register', userObject);
+      const { data } = await authFetch.post('auth/register', userObject);
       const { user, token } = data;
-      localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('token', token);
-      return { user, token, message: 'User created successfully' };
+      return { user, token };
     } catch (error) {
-      return { message: error.response.data.message };
+      return rejectWithValue({ message: error.response.data.message });
     }
   }
 );
+
+export const hideAlert = createAsyncThunk('user/hideAlert', async () => {
+  setTimeout(() => {
+    return Promise.fulfilled();
+  }, 3000);
+});
+
+export const logoutUser = createAsyncThunk('user/logoutUser', () => {
+  localStorage.removeItem('user');
+  localStorage.removeItem('token');
+  return Promise.fulfilled();
+});
 
 export const userSlice = createSlice({
   name: 'user',
@@ -44,7 +49,40 @@ export const userSlice = createSlice({
     user: currentUser || null,
     token: currentToken || null,
     status: 'idle',
-    alertText: null,
+    showAlert: false,
+    alertType: '',
+    alertMessage: '',
   },
-  reducers: {},
+  reducers: {
+    // some reducers
+  },
+  extraReducers: (builder) => {
+    builder.addCase(registerUser.pending, (state, action) => {
+      state.status = 'loading';
+    });
+    builder.addCase(registerUser.fulfilled, (state, action) => {
+      const { user, token } = action.payload;
+      addUserToLocalStorage({ user, token });
+      state.user = action.payload.user;
+      state.token = action.payload.token;
+      state.alertType = 'success';
+      state.alertMessage = 'User logged in successfully';
+      state.showAlert = true;
+    });
+    builder.addCase(registerUser.rejected, (state, action) => {
+      state.status = 'idle';
+      state.showAlert = true;
+      state.alertType = 'error';
+      state.alertMessage = action.payload.message;
+    });
+    builder.addCase(hideAlert.fulfilled, (state, action) => {
+      state.showAlert = false;
+    });
+    builder.addCase(logoutUser.fulfilled, (state, action) => {
+      state.user = null;
+      state.token = null;
+    });
+  },
 });
+
+export default userSlice.reducer;
