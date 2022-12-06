@@ -79,7 +79,7 @@ const updateTicket = async (req, res, next) => {
     const { _id, description, status } = req.body;
     if (!_id) throw new BadRequestError('Please specify a ticket ID');
     const ticket = await getTicket(next, _id);
-    if (ticket._id !== req.userId) {
+    if (!ticket.createdBy.equals(req.userId)) {
       throw new AuthorizationError(
         'You are not authorized to modify this ticket'
       );

@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../../context';
 import { TextField, Button, Alert } from '@mui/material';
+import { useAppSelector, useAppDispatch } from '../../hooks';
+import { updateUser } from '../../features/users/userSlice';
 
 const Profile = () => {
-  const { user, showAlert, alertType, alertText, updateUser } = useAppContext();
+  const user = useAppSelector((state) => state.user.user);
+  const showAlert = useAppSelector((state) => state.ui.showAlert);
+  const alertType = useAppSelector((state) => state.ui.alertType);
+  const alertMessage = useAppSelector((state) => state.ui.alertMessage);
+  const dispatch = useAppDispatch();
+
   const profileFormValues = {
     name: user.name,
     email: user.email,
   };
+
   const [formValues, setFormValues] = useState(profileFormValues);
 
   const handleChange = (e) => {
@@ -19,7 +27,7 @@ const Profile = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    updateUser(formValues);
+    dispatch(updateUser({ userId: user.userId, ...formValues }));
   };
   return (
     <main className='p-4 md:container md:mx-auto'>

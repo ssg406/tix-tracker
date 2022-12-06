@@ -1,12 +1,12 @@
-import { redirect } from 'react-router-dom';
-import { useAppContext } from '../context';
-import Register from './Register';
+import { Navigate } from 'react-router-dom';
+import { useAppSelector } from '../hooks';
 
 const ProtectedRoute = ({ children }) => {
-  const { user, token } = useAppContext();
+  // const { user, token } = useAppContext();
+  const user = useAppSelector((state) => state.user.user);
 
   if (!user) {
-    return redirect('/landing');
+    return <Navigate to='/landing' />;
   }
   return children;
 };

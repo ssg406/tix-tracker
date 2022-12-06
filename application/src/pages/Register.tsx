@@ -2,7 +2,15 @@ import { useState, useEffect, ChangeEvent, MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../assets/logo_svg.svg';
 import { useAppContext } from '../context';
-import { Button, TextField, Alert } from '@mui/material';
+import { Button, TextField, Alert, AlertColor } from '@mui/material';
+
+// Redux
+import { useAppDispatch, useAppSelector } from '../hooks';
+import {
+  loginUser,
+  registerUser,
+  hideAlert,
+} from '../features/users/userSlice';
 
 const formValues = {
   name: '',
@@ -16,8 +24,18 @@ const formValues = {
 
 const Register = () => {
   const [formState, setFormState] = useState(formValues);
-  const { isLoading, showAlert, registerUser, user, alertText, alertType } = useAppContext();
+  // const { isLoading, showAlert, registerUser, user, alertText, alertType } =
+  //   useAppContext();
   const navigate = useNavigate();
+
+  // REDUX
+  const user = useAppSelector((state) => state.user.user);
+  const showAlert = useAppSelector((state) => state.user.showAlert);
+  const alertMessage = useAppSelector((state) => state.user.alertMessage);
+  const alertType = useAppSelector((state) => state.user.alertType);
+  const status = useAppSelector((state) => state.user.status);
+  const dispatch = useAppDispatch();
+  // ^^ REDUX
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     // Set formState using dynamic key from event
@@ -29,21 +47,23 @@ const Register = () => {
 
     // Call async function with either /login or /register endpoint
     if (formState.isMember) {
-      registerUser({
-        formState,
-        endpoint: 'login',
-        alertText: 'Signed in successfully!',
-      });
+      dispatch(loginUser(formState));
+      // registerUser({
+      //   formState,
+      //   endpoint: 'login',
+      //   alertText: 'Signed in successfully!',
+      // });
       setFormState({
         ...formState,
         password: '',
       });
     } else {
-      registerUser({
-        formState,
-        endpoint: 'register',
-        alertText: 'User registered successfully!',
-      });
+      dispatch(registerUser(formState));
+      // registerUser({
+      //   formState,
+      //   endpoint: 'register',
+      //   alertText: 'User registered successfully!',
+      // });
       setFormState({
         ...formState,
         password: '',
@@ -66,12 +86,20 @@ const Register = () => {
 
   // Monitor password confirm field for match validation
   useEffect(() => {
-    if (formState.password !== formState.confirm && (formState.password.length > 5 && formState.confirm.length > 5)) {
-      setFormState({...formState, formError: true, formErrorMessage: 'Passwords do not match'})
+    if (
+      formState.password !== formState.confirm &&
+      formState.password.length > 5 &&
+      formState.confirm.length > 5
+    ) {
+      setFormState({
+        ...formState,
+        formError: true,
+        formErrorMessage: 'Passwords do not match',
+      });
     } else {
-      setFormState({...formState, formError: false, formErrorMessage: ''})
+      setFormState({ ...formState, formError: false, formErrorMessage: '' });
     }
-  }, [formState.password, formState.confirm])
+  }, [formState.password, formState.confirm]);
 
   return (
     <div className='md:container md:mx-auto md:max-w-lg p-4 flex flex-col gap-6 items-center justify-center  h-screen'>
@@ -79,7 +107,9 @@ const Register = () => {
       <h2 className='text-xl font-medium tracking-tight'>
         {formState.isMember ? 'Login' : 'Create Account'}
       </h2>
-      {showAlert && <Alert severity={alertType}>{alertText}</Alert>}
+      {showAlert && (
+        <Alert severity={alertType as AlertColor}>{alertMessage}</Alert>
+      )}
       <form className='w-full p-2 flex flex-col gap-6 md:p-8 md:bg-slate-100 md:rounded-xl'>
         {/* Name field displays only if member toggle is false */}
         {!formState.isMember && (
@@ -122,7 +152,12 @@ const Register = () => {
             helperText={formState.formError && formState.formErrorMessage}
           />
         )}
-        <Button variant='contained' type='submit' onClick={handleSubmit} disabled={isLoading}>
+        <Button
+          variant='contained'
+          type='submit'
+          onClick={handleSubmit}
+          disabled={status === 'loading'}
+        >
           {formState.isMember ? 'Login' : 'Register'}
         </Button>
       </form>
