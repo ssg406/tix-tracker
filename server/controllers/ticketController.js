@@ -41,7 +41,7 @@ const getAllTickets = async (req, res, next) => {
 
 const createTicket = async (req, res, next) => {
   try {
-    const newTicket = new Ticket(req.body);
+    const newTicket = new Ticket({ ...req.body, createdBy: req.userId });
     await newTicket.save();
     res.status(StatusCodes.CREATED).json({
       ticket: {

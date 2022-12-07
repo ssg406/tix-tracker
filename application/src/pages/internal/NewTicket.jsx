@@ -1,7 +1,14 @@
-import { useAppContext } from '../../context';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Alert, Button, TextField } from '@mui/material';
+import { Button, TextField } from '@mui/material';
+import {
+  useAddNewTicketMutation,
+  useUpdateTicketMutation,
+} from '../../features/api/apiSlice';
+import { showAlert, hideAlert } from '../../features/ui/uiSlice';
+import { useAppSelector, useAppDispatch } from '../../hooks';
+import { Alert } from '../../components';
+import { cancelEditTicket } from '../../features/tickets/ticketsSlice';
 
 const initialFormValues = {
   date: '',
@@ -9,36 +16,77 @@ const initialFormValues = {
 };
 
 const NewTicket = () => {
-  const {
-    showAlert,
-    createTicket,
-    alertType,
-    alertText,
-    isEditingTicket,
-    editTicketId,
-    date,
-    status,
-    description,
-  } = useAppContext();
-
   const navigate = useNavigate();
-
   const [formValues, setFormValues] = useState(initialFormValues);
+  // Tracks editing state within the component outside of Redux store
+  const [isEditing, setIsEditing] = useState({ flag: false, id: '' });
+  const [addNewTicket, { addIsLoading }] = useAddNewTicketMutation();
+  const [updateTicket, { updatingIsLoading }] = useUpdateTicketMutation();
+  const editingTicketId = useAppSelector(
+    (state) => state.tickets.editingTicketId
+  );
+  const editingTicketDescription = useAppSelector(
+    (state) => state.tickets.editingTicketDescription
+  );
+  const editingTicketDate = useAppSelector(
+    (state) => state.tickets.editingTicketDate
+  );
+  const isEditingTicket = useAppSelector(
+    (state) => state.tickets.isEditingTicket
+  );
+  const dispatch = useAppDispatch();
 
-  if (isEditingTicket) {
-    console.log({ editTicketId, date, status, description });
-  }
+  // Check the redux store on render to see if ticket is being edited
+  useEffect(() => {
+    if (isEditingTicket) {
+      // Set local component state to track ticket editing details
+      setIsEditing({ flag: true, id: editingTicketId });
+      setFormValues({
+        date: editingTicketDate.substring(0, 10),
+        description: editingTicketDescription,
+      });
+      // Clear the redux store of ticket editing details. Page will show as new ticket form
+      // if user navigates away without hitting submit
+      dispatch(cancelEditTicket());
+    } else {
+      setFormValues(initialFormValues);
+    }
+  }, []);
 
   // Submit new ticket form
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isEditingTicket) {
-      createTicket(formValues);
+    // Handle the editing case
+    if (isEditing.flag) {
+      try {
+        await updateTicket({
+          _id: isEditing.id,
+          date: formValues.date,
+          description: formValues.description,
+        }).unwrap();
+        setFormValues(initialFormValues);
+        navigate('/');
+      } catch (error) {
+        dispatch(
+          showAlert({ alertType: 'error', message: error.data.message })
+        );
+      }
+      // Handle the new ticket case
     } else {
-      // handle edit ticket case
+      try {
+        await addNewTicket(formValues).unwrap();
+        setFormValues(initialFormValues);
+        navigate('/');
+      } catch (error) {
+        dispatch(
+          showAlert({ alertType: 'error', message: error.data.message })
+        );
+      }
     }
-    navigate('/');
+    // Clear any alerts displayed
+    setTimeout(() => dispatch(hideAlert()), 3000);
   };
+
   // Write to form state on change
   const handleChange = (e) => {
     setFormValues({
@@ -50,24 +98,19 @@ const NewTicket = () => {
   return (
     <main className='p-4 md:container md:mx-auto'>
       <h2 className='text-xl font-bold tracking-tight mb-6'>
-        {isEditingTicket ? 'Edit Ticket' : 'Create Ticket'}
+        {isEditing.flag ? 'Edit Ticket' : 'Create Ticket'}
       </h2>
-      {showAlert && (
-        <Alert
-          sx={{ marginTop: '20px', marginBottom: '20px' }}
-          severity={alertType}
-        >
-          {alertText}
-        </Alert>
-      )}
+      <Alert />
       <form className='flex flex-col gap-4'>
         <TextField
+          value={formValues.date}
           type='date'
           name='date'
           onChange={handleChange}
           variant='standard'
         />
         <TextField
+          value={formValues.description}
           name='description'
           type='text'
           label='Description'
@@ -77,8 +120,13 @@ const NewTicket = () => {
           multiline
           minRows={6}
         />
-        <Button type='submit' variant='contained' onClick={handleSubmit}>
-          {isEditingTicket ? 'Update Ticket' : 'Submit Ticket'}
+        <Button
+          disabled={addIsLoading || updatingIsLoading}
+          type='submit'
+          variant='contained'
+          onClick={handleSubmit}
+        >
+          {isEditing.flag ? 'Update Ticket' : 'Submit Ticket'}
         </Button>
       </form>
     </main>

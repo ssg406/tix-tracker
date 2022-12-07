@@ -1,8 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { navigationLinks } from '../data';
+import { useAppDispatch } from '../hooks';
+import { logoutUser } from '../features/users/userSlice';
 
 const FullNav = () => {
+  const dispatch = useAppDispatch();
   return (
     <nav className='flex gap-6 font-medium text-neutral-100 uppercase '>
       {navigationLinks.map(({ id, path, text }) => {
@@ -16,7 +19,9 @@ const FullNav = () => {
           </Link>
         );
       })}
-      <button className='uppercase'>Logout</button>
+      <button onClick={() => dispatch(logoutUser())} className='uppercase'>
+        Logout
+      </button>
     </nav>
   );
 };

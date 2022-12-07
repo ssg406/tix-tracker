@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { useAppContext } from '../context';
 import {
   Drawer,
   List,
@@ -16,6 +15,9 @@ import AddBoxIcon from '@mui/icons-material/AddBox';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import useConfirmationDialog from '../hooks/useConfirmationDialog';
 import ConfirmationDialog from './ConfirmationDialog';
+import { useAppDispatch, useAppSelector } from '../hooks';
+import { logoutUser } from '../features/users/userSlice';
+import { toggleNavDrawer } from '../features/ui/uiSlice';
 
 const navigationLinks = [
   {
@@ -39,10 +41,15 @@ const navigationLinks = [
 ];
 
 const MobileNav = () => {
-  const { showMobileNav, logoutUser, toggleMobileNav } = useAppContext();
+  // const { showMobileNav, logoutUser, toggleMobileNav } = useAppContext();
+  const dispatch = useAppDispatch();
+  const showMobileNav = useAppSelector((state) => state.ui.showMobileNav);
+
+  const logout = () => dispatch(logoutUser());
+  const toggleMobileNav = () => dispatch(toggleNavDrawer());
 
   const { dialogOpen, handleDialogOpen, handleDialogClose } =
-    useConfirmationDialog(logoutUser, toggleMobileNav);
+    useConfirmationDialog(logout, toggleMobileNav);
 
   return (
     <nav>

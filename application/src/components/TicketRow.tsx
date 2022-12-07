@@ -17,6 +17,9 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import TicketContextMenu from './TicketContextMenu';
 import ConfirmationDialog from './ConfirmationDialog';
 import useConfirmationDialog from '../hooks/useConfirmationDialog';
+import { useAppDispatch } from '../hooks';
+import { useCancelTicketMutation } from '../features/api/apiSlice';
+import { setEditTicket } from '../features/tickets/ticketsSlice';
 
 type Props = {
   status: string;
@@ -28,16 +31,19 @@ type Props = {
 const TicketRow = ({ status, description, ticketId, date }: Props) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);
-  const { cancelTicket, setEditTicket } = useAppContext();
   const dateObj = new Date(date);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
+  //RTK
+  const [cancelTicket] = useCancelTicketMutation();
 
   const handleCancelTicket = () => {
-    cancelTicket({ ticketId });
+    cancelTicket(ticketId);
   };
 
   const handleEditTicket = () => {
-    setEditTicket(ticketId);
+    dispatch(setEditTicket({ ticketId, date, description }));
     navigate('new-ticket');
   };
 

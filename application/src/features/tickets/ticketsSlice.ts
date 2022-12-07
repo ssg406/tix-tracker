@@ -19,6 +19,8 @@ type Ticket = {
   status: string;
   date: string;
   description: string;
+  createdBy: string;
+  updatedOn: string;
 };
 
 const ticketsAdapter = createEntityAdapter<Ticket>({
@@ -30,113 +32,32 @@ const ticketsAdapter = createEntityAdapter<Ticket>({
   },
 });
 
-export const loadTickets = createAsyncThunk(
-  'tickets/ticketsLoaded',
-  async (ticketData, { rejectWithValue }) => {
-    try {
-      const { data } = await ticketsFetch.get('/all/?status=all&sort=newest');
-      return { tickets: data };
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        return rejectWithValue({ message: error.response?.data.message });
-      } else {
-        return rejectWithValue({ message: 'Internal Error' });
-      }
-    }
-  }
-);
-
-export const addTicket = createAsyncThunk(
-  'tickets/addTicket',
-  async (ticketData, { rejectWithValue }) => {
-    try {
-      const { data } = await ticketsFetch.post('/new', ticketData);
-      return { ticket: data.ticket };
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        return rejectWithValue({ message: error.response?.data.message });
-      } else {
-        return rejectWithValue({ message: 'Internal Error' });
-      }
-    }
-  }
-);
-
-export const cancelTicket = createAsyncThunk(
-  'tickets/cancelTicket',
-  async (ticketId, { rejectWithValue }) => {
-    try {
-      const { data } = await ticketsFetch.patch(`/cancel/${ticketId}`);
-      return { ticket: data.ticket };
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        return rejectWithValue({ message: error.response?.data.message });
-      } else {
-        return rejectWithValue({ message: 'Internal Error' });
-      }
-    }
-  }
-);
-
-export const updateTicket = createAsyncThunk(
-  'tickets/updateTicket',
-  async (ticketData, { rejectWithValue }) => {
-    try {
-      const { data } = await ticketsFetch.patch('/update', ticketData);
-      return { ticket: data.ticket };
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        return rejectWithValue({ message: error.response?.data.message });
-      } else {
-        return rejectWithValue({ message: 'Internal Error' });
-      }
-    }
-  }
-);
-
 export const ticketsSlice = createSlice({
   name: 'tickets',
-  initialState: ticketsAdapter.getInitialState({ status: 'idle' }),
-  reducers: {},
-  extraReducers: (builder) => {
-    builder.addCase(loadTickets.pending, (state, action) => {
-      state.status = 'loading';
-    });
-    builder.addCase(loadTickets.fulfilled, (state, action) => {
-      state.status = 'idle';
-      ticketsAdapter.setAll(state, action.payload.tickets);
-    });
-    builder.addCase(loadTickets.rejected, (state, action) => {
-      state.status = 'error';
-    });
-    builder.addCase(addTicket.pending, (state, action) => {
-      state.status = 'loading';
-    });
-    builder.addCase(addTicket.fulfilled, (state, action) => {
-      state.status = 'idle';
-      ticketsAdapter.addOne(state, action.payload.ticket);
-    });
-    builder.addCase(addTicket.rejected, (state, action) => {
-      state.status = 'error';
-    });
-    builder.addCase(updateTicket.pending, (state, action) => {
-      state.status = 'loading';
-    });
-    builder.addCase(updateTicket.fulfilled, (state, action) => {
-      state.status = 'idle';
-      ticketsAdapter.updateOne(state, {
-        id: action.payload.ticket._id,
-        changes: {
-          date: action.payload.ticket.date,
-          description: action.payload.ticket.description,
-        },
-      });
-    });
-    builder.addCase(updateTicket.rejected, (state, action) => {
-      state.status = 'error';
-    });
+  initialState: ticketsAdapter.getInitialState({
+    status: 'idle',
+    isEditingTicket: false,
+    editingTicketId: null,
+    editingTicketDate: '',
+    editingTicketDescription: '',
+  }),
+  reducers: {
+    setEditTicket(state, action) {
+      state.isEditingTicket = true;
+      state.editingTicketId = action.payload.ticketId;
+      state.editingTicketDate = action.payload.date;
+      state.editingTicketDescription = action.payload.description;
+    },
+    cancelEditTicket(state) {
+      state.isEditingTicket = false;
+      state.editingTicketId = null;
+      state.editingTicketDate = '';
+      state.editingTicketDescription = '';
+    },
   },
 });
+
+export const { setEditTicket, cancelEditTicket } = ticketsSlice.actions;
 
 export const ticketsSelectors = ticketsAdapter.getSelectors(
   (state: RootState) => state.tickets

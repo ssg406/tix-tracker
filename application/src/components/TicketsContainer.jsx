@@ -1,22 +1,20 @@
 import React, { useEffect } from 'react';
 import TicketRow from './TicketRow';
-import { Stack, CircularProgress } from '@mui/material';
-import { useAppDispatch, useAppSelector } from '../hooks';
-import { loadTickets } from '../features/tickets/ticketsSlice';
-import { ticketsSelectors } from '../features/tickets/ticketsSlice';
+import { Stack, CircularProgress, Alert } from '@mui/material';
+import { useGetTicketsQuery } from '../features/api/apiSlice';
 
 const TicketsContainer = () => {
-  const dispatch = useAppDispatch();
-  const loading = useAppSelector((state) => state.tickets.status);
-  const tickets = useAppSelector(ticketsSelectors.selectAll);
-
-  useEffect(() => {
-    dispatch(loadTickets());
-  }, []);
-
-  if (loading === 'idle') {
+  const {
+    data: tickets,
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+    isFetching,
+  } = useGetTicketsQuery();
+  if (isSuccess) {
     return (
-      <section>
+      <section className={`{isFetching && opacity-80}`}>
         <Stack spacing={2}>
           {tickets.length === 0 ? (
             <h3 className='text-center text-xl font-medium my-20'>
@@ -38,12 +36,10 @@ const TicketsContainer = () => {
         </Stack>
       </section>
     );
-  } else {
-    return (
-      <div className='flex justify-center items-center'>
-        <CircularProgress />
-      </div>
-    );
+  } else if (isError) {
+    return <div>{error.toString}</div>;
+  } else if (isLoading) {
+    return <div>Loading</div>;
   }
 };
 

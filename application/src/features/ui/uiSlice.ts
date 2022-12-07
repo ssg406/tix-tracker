@@ -22,11 +22,8 @@ export const uiSlice = createSlice({
   name: 'ui',
   initialState: initialState,
   reducers: {
-    showNavDrawer(state, action) {
-      state.showMobileNav = true;
-    },
-    hideNavDrawer(state, action) {
-      state.showMobileNav = false;
+    toggleNavDrawer(state) {
+      state.showMobileNav = !state.showMobileNav;
     },
     setStatusFilter(state, action) {
       state.statusFilter = action.payload.status;
@@ -39,14 +36,19 @@ export const uiSlice = createSlice({
       state.alertMessage = action.payload.message;
       state.alertType = action.payload.alertType;
     },
-    hideAlert(state, action) {
+    hideAlert(state) {
       state.showAlert = false;
       state.alertMessage = '';
     },
   },
 });
 
-export const { showNavDrawer, hideNavDrawer, setStatusFilter, setSortOption } =
-  uiSlice.actions;
+export const {
+  setStatusFilter,
+  setSortOption,
+  toggleNavDrawer,
+  hideAlert,
+  showAlert,
+} = uiSlice.actions;
 
 export default uiSlice.reducer;
