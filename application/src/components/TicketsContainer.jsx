@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import TicketRow from './TicketRow';
 import { Stack, CircularProgress, Alert } from '@mui/material';
 import { useGetTicketsQuery } from '../features/api/apiSlice';
+import { useAppDispatch } from '../hooks';
 
 const TicketsContainer = () => {
   const {
@@ -12,6 +13,7 @@ const TicketsContainer = () => {
     error,
     isFetching,
   } = useGetTicketsQuery();
+  const dispatch = useAppDispatch();
   if (isSuccess) {
     return (
       <section className={`{isFetching && opacity-80}`}>
@@ -37,9 +39,13 @@ const TicketsContainer = () => {
       </section>
     );
   } else if (isError) {
-    return <div>{error.toString}</div>;
+    <Alert severity='error'>{error.data.message}</Alert>;
   } else if (isLoading) {
-    return <div>Loading</div>;
+    return (
+      <div className='flex justify-center items-center'>
+        <CircularProgress />
+      </div>
+    );
   }
 };
 

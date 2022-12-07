@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-import { TextField, Button, Alert } from '@mui/material';
+import { TextField, Button } from '@mui/material';
 import { useAppSelector, useAppDispatch } from '../../hooks';
 import { updateUser } from '../../features/users/userSlice';
+import { Alert } from '../../components';
+import { showAlert, hideAlert } from '../../features/ui/uiSlice';
 
 const Profile = () => {
   const user = useAppSelector((state) => state.user.user);
-  const showAlert = useAppSelector((state) => state.ui.showAlert);
-  const alertType = useAppSelector((state) => state.ui.alertType);
-  const alertMessage = useAppSelector((state) => state.ui.alertMessage);
   const dispatch = useAppDispatch();
 
   const profileFormValues = {
@@ -24,17 +23,33 @@ const Profile = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(updateUser({ userId: user.userId, ...formValues }));
+    // Dispatch update function and unwrap
+    try {
+      await dispatch(
+        updateUser({ userId: user.userId, ...formValues })
+      ).unwrap();
+      dispatch(
+        showAlert({
+          alertType: 'success',
+          message: 'User updated successfully',
+        })
+      );
+    } catch (error) {
+      dispatch(showAlert({ alertType: 'error', message: error.message }));
+      // Reset to initial value on error
+      setFormValues(profileFormValues);
+    }
+    setTimeout(() => dispatch(hideAlert()), 3000);
   };
   return (
     <main className='p-4 md:container md:mx-auto'>
       <h2 className='text-xl font-bold tracking-tight mb-6'>
         Account Information
       </h2>
-      {showAlert && <Alert severity={alertType}>{alertText}</Alert>}
-      <form className='flex flex-col gap-6'>
+      <Alert />
+      <form className='flex flex-col gap-6 mt-6'>
         <TextField
           name='name'
           type='text'

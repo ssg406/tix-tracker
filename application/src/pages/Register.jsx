@@ -1,16 +1,11 @@
 import { useState, useEffect, ChangeEvent, MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../assets/logo_svg.svg';
-import { useAppContext } from '../context';
-import { Button, TextField, Alert, AlertColor } from '@mui/material';
-
-// Redux
+import { Alert } from '../components';
+import { Button, TextField } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../hooks';
-import {
-  loginUser,
-  registerUser,
-  hideAlert,
-} from '../features/users/userSlice';
+import { loginUser, registerUser } from '../features/users/userSlice';
+import { showAlert, hideAlert } from '../features/ui/uiSlice';
 
 const formValues = {
   name: '',
@@ -24,65 +19,54 @@ const formValues = {
 
 const Register = () => {
   const [formState, setFormState] = useState(formValues);
-  // const { isLoading, showAlert, registerUser, user, alertText, alertType } =
-  //   useAppContext();
   const navigate = useNavigate();
-
-  // REDUX
   const user = useAppSelector((state) => state.user.user);
-  const showAlert = useAppSelector((state) => state.user.showAlert);
-  const alertMessage = useAppSelector((state) => state.user.alertMessage);
-  const alertType = useAppSelector((state) => state.user.alertType);
   const status = useAppSelector((state) => state.user.status);
   const dispatch = useAppDispatch();
-  // ^^ REDUX
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
+  const handleChange = (e) => {
     // Set formState using dynamic key from event
     setFormState({ ...formState, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: MouseEvent<HTMLButtonElement>): void => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
     // Call async function with either /login or /register endpoint
     if (formState.isMember) {
-      dispatch(loginUser(formState));
-      // registerUser({
-      //   formState,
-      //   endpoint: 'login',
-      //   alertText: 'Signed in successfully!',
-      // });
-      setFormState({
-        ...formState,
-        password: '',
-      });
+      try {
+        await dispatch(loginUser(formState)).unwrap();
+        setFormState({
+          ...formState,
+          password: '',
+        });
+      } catch (error) {
+        dispatch(showAlert({ alertType: 'error', message: error.message }));
+      }
     } else {
-      dispatch(registerUser(formState));
-      // registerUser({
-      //   formState,
-      //   endpoint: 'register',
-      //   alertText: 'User registered successfully!',
-      // });
-      setFormState({
-        ...formState,
-        password: '',
-        confirm: '',
-      });
+      try {
+        await dispatch(registerUser(formState)).unwrap();
+        setFormState({
+          ...formState,
+          password: '',
+          confirm: '',
+        });
+      } catch (error) {
+        dispatch(showAlert({ alertType: 'error', message: error.message }));
+      }
     }
+    setTimeout(() => dispatch(hideAlert()), 3000);
   };
-
   // Toggles form between login and register modes
   const toggleForm = () => {
     setFormState({ ...formState, isMember: !formState.isMember });
   };
 
-  // Navigate to root if user exists in context
+  // Navigate to root if user exists in state
   useEffect(() => {
     if (user) {
       navigate('/');
     }
-  }, [user, navigate]);
+  }, [user]);
 
   // Monitor password confirm field for match validation
   useEffect(() => {
@@ -107,9 +91,7 @@ const Register = () => {
       <h2 className='text-xl font-medium tracking-tight'>
         {formState.isMember ? 'Login' : 'Create Account'}
       </h2>
-      {showAlert && (
-        <Alert severity={alertType as AlertColor}>{alertMessage}</Alert>
-      )}
+      <Alert />
       <form className='w-full p-2 flex flex-col gap-6 md:p-8 md:bg-slate-100 md:rounded-xl'>
         {/* Name field displays only if member toggle is false */}
         {!formState.isMember && (
@@ -163,9 +145,6 @@ const Register = () => {
       </form>
       <p className=''>
         {formState.isMember ? 'No account yet? ' : 'Registered already? '}
-        {/* <button onClick={toggleForm} className='font-bold text-slate-700'>
-          {formState.isMember ? 'Register' : 'Login'}
-        </button> */}
         <Button variant='text' onClick={toggleForm}>
           {formState.isMember ? 'Register' : 'Login'}
         </Button>
