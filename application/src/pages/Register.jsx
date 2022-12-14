@@ -2,7 +2,7 @@ import { useState, useEffect, ChangeEvent, MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../assets/logo_svg.svg';
 import { Alert } from '../components';
-import { Button, TextField } from '@mui/material';
+import { Button, TextField, CircularProgress } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { loginUser, registerUser } from '../features/users/userSlice';
 import { showAlert, hideAlert } from '../features/ui/uiSlice';
@@ -91,6 +91,7 @@ const Register = () => {
       <h2 className='text-xl font-medium tracking-tight'>
         {formState.isMember ? 'Login' : 'Create Account'}
       </h2>
+      {status === 'loading' && <CircularProgress />}
       <Alert />
       <form className='w-full p-2 flex flex-col gap-6 md:p-8 md:bg-slate-100 md:rounded-xl'>
         {/* Name field displays only if member toggle is false */}

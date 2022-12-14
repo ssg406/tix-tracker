@@ -2,7 +2,6 @@ import StatusTag from './StatusTag';
 import { format } from 'date-fns';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppContext } from '../context';
 import {
   Menu,
   MenuItem,
@@ -72,6 +71,7 @@ const TicketRow = ({ status, description, ticketId, date }: Props) => {
           <button
             onClick={handleClick}
             id='basic-button'
+            aria-label='more options'
             aria-controls={menuOpen ? 'basic-menu' : undefined}
             aria-haspopup='true'
             aria-expanded={menuOpen ? 'true' : undefined}

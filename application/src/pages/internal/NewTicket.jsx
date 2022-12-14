@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, TextField } from '@mui/material';
+import { Button, TextField, CircularProgress } from '@mui/material';
 import {
   useAddNewTicketMutation,
   useUpdateTicketMutation,
@@ -9,6 +9,7 @@ import { showAlert, hideAlert } from '../../features/ui/uiSlice';
 import { useAppSelector, useAppDispatch } from '../../hooks';
 import { Alert } from '../../components';
 import { cancelEditTicket } from '../../features/tickets/ticketsSlice';
+import { logoutUser } from '../../features/users/userSlice';
 
 const initialFormValues = {
   date: '',
@@ -59,14 +60,19 @@ const NewTicket = () => {
     // Handle the editing case
     if (isEditing.flag) {
       try {
-        await updateTicket({
-          _id: isEditing.id,
-          date: formValues.date,
-          description: formValues.description,
-        }).unwrap();
+        await dispatch(
+          updateTicket({
+            _id: isEditing.id,
+            date: formValues.date,
+            description: formValues.description,
+          })
+        ).unwrap();
         setFormValues(initialFormValues);
         navigate('/');
       } catch (error) {
+        if (error.status === 401) {
+          dispatch(logoutUser());
+        }
         dispatch(
           showAlert({ alertType: 'error', message: error.data.message })
         );
@@ -74,10 +80,13 @@ const NewTicket = () => {
       // Handle the new ticket case
     } else {
       try {
-        await addNewTicket(formValues).unwrap();
+        await dispatch(addNewTicket(formValues)).unwrap();
         setFormValues(initialFormValues);
         navigate('/');
       } catch (error) {
+        if (error.status === 401) {
+          dispatch(logoutUser());
+        }
         dispatch(
           showAlert({ alertType: 'error', message: error.data.message })
         );
@@ -100,6 +109,7 @@ const NewTicket = () => {
       <h2 className='text-xl font-bold tracking-tight mb-6'>
         {isEditing.flag ? 'Edit Ticket' : 'Create Ticket'}
       </h2>
+      {(addIsLoading || updatingIsLoading) && <CircularProgress />}
       <Alert />
       <form className='flex flex-col gap-4'>
         <TextField

@@ -3,6 +3,7 @@ import TicketRow from './TicketRow';
 import { Stack, CircularProgress, Alert } from '@mui/material';
 import { useGetTicketsQuery } from '../features/api/apiSlice';
 import { useAppDispatch } from '../hooks';
+import { logoutUser } from '../features/users/userSlice';
 
 const TicketsContainer = () => {
   const {
@@ -16,7 +17,7 @@ const TicketsContainer = () => {
   const dispatch = useAppDispatch();
   if (isSuccess) {
     return (
-      <section className={`{isFetching && opacity-80}`}>
+      <section aria-busy={isLoading} className={`{isFetching && opacity-80}`}>
         <Stack spacing={2}>
           {tickets.length === 0 ? (
             <h3 className='text-center text-xl font-medium my-20'>
@@ -39,7 +40,10 @@ const TicketsContainer = () => {
       </section>
     );
   } else if (isError) {
-    <Alert severity='error'>{error.data.message}</Alert>;
+    if (error.status === 401) {
+      dispatch(logoutUser());
+    }
+    return <Alert severity='error'>{error.data.message}</Alert>;
   } else if (isLoading) {
     return (
       <div className='flex justify-center items-center'>

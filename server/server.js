@@ -1,12 +1,22 @@
 import express from 'express';
 import * as dotenv from 'dotenv';
+import helmet from 'helmet';
+import mongoSanitize from 'express-mongo-sanitize';
+import cookieParser from 'cookie-parser';
+import xss from 'xss-clean';
+import cors from 'cors';
+
+// MongoDB connection
+import dbConnector from './dbConnector.js';
+
+// Routers
 import authRouter from './routes/authRouter.js';
 import ticketRouter from './routes/ticketRouter.js';
+
+// Middleware
 import errorHandler from './middleware/errorHandler.js';
-import dbConnector from './dbConnector.js';
 import checkToken from './middleware/authHandler.js';
-import cors from 'cors';
-import morgan from 'morgan';
+import notFound from './middleware/notFound.js';
 
 // Configuration
 dotenv.config();
@@ -14,11 +24,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan('combined'));
+app.use(helmet());
+app.use(xss());
+app.use(mongoSanitize());
+app.use(cookieParser());
 
 // Router middleware
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/tickets', checkToken, ticketRouter);
+
+// Not found middleware
+app.use(notFound);
 
 //Error handler middleware
 app.use(errorHandler);

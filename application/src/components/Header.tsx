@@ -14,7 +14,11 @@ const Header = () => {
           <img src={Logo} alt='Trakr Logo' className='h-10 md:h-12' />
         </div>
         <div className='md:hidden'>
-          <button onClick={() => dispatch(toggleNavDrawer())}>
+          <button
+            type='button'
+            aria-label='navigationMenu'
+            onClick={() => dispatch(toggleNavDrawer())}
+          >
             <FiMenu className='text-neutral-300 text-4xl' />
           </button>
         </div>

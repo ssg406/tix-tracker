@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { BaseThunkAPI } from '@reduxjs/toolkit/dist/createAsyncThunk';
 import axios, { AxiosError } from 'axios';
 import { AnyAction } from 'redux';
 import { RootState } from '../../store';

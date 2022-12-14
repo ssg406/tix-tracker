@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { TextField, Button } from '@mui/material';
+import { TextField, Button, CircularProgress } from '@mui/material';
 import { useAppSelector, useAppDispatch } from '../../hooks';
-import { updateUser } from '../../features/users/userSlice';
+import { logoutUser, updateUser } from '../../features/users/userSlice';
 import { Alert } from '../../components';
 import { showAlert, hideAlert } from '../../features/ui/uiSlice';
 
 const Profile = () => {
   const user = useAppSelector((state) => state.user.user);
+  const status = useAppSelector((state) => state.user.status);
   const dispatch = useAppDispatch();
 
   const profileFormValues = {
@@ -37,6 +38,9 @@ const Profile = () => {
         })
       );
     } catch (error) {
+      if (error.status === 401) {
+        dispatch(logoutUser());
+      }
       dispatch(showAlert({ alertType: 'error', message: error.message }));
       // Reset to initial value on error
       setFormValues(profileFormValues);
@@ -49,6 +53,7 @@ const Profile = () => {
         Account Information
       </h2>
       <Alert />
+      {status === 'loading' && <CircularProgress />}
       <form className='flex flex-col gap-6 mt-6'>
         <TextField
           name='name'
