@@ -70,7 +70,6 @@ const TicketRow = ({ status, description, ticketId, date }: Props) => {
         <div className='flex justify-end'>
           <button
             onClick={handleClick}
-            id='basic-button'
             aria-label='more options'
             aria-controls={menuOpen ? 'basic-menu' : undefined}
             aria-haspopup='true'
