@@ -1,4 +1,5 @@
 import { Chip } from '@mui/material';
+import { purple, red } from '@mui/material/colors';
 
 type Props = {
   status: string;
@@ -6,15 +7,26 @@ type Props = {
 
 const StatusTag = ({ status }: Props) => {
   const statusMap: Record<string, string> = {
-    open: 'info',
-    closed: 'success',
-    cancelled: 'warning',
-    'in-progress': 'info',
+    open: '#004d40',
+    closed: '#1b5e20',
+    cancelled: '#c62828',
+    'in-progress': '#311b92',
   };
 
   const statusLabel = status.toUpperCase();
 
-  return <Chip label={statusLabel} color={statusMap[status]} />;
+  return (
+    <Chip
+      sx={{
+        fontWeight: 'fontWeightBold',
+        color: statusMap[status],
+        borderColor: statusMap[status],
+        borderWidth: 2,
+      }}
+      label={statusLabel}
+      variant='outlined'
+    />
+  );
 };
 
 export default StatusTag;

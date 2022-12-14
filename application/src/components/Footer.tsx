@@ -34,7 +34,7 @@ const Footer = () => {
 
   return (
     <footer className='w-full md:h-14 fixed bottom-0 left-0 md:bg-neutral-300'>
-      <nav className='md:hidden'>
+      <nav className=''>
         <BottomNavigation showLabels value={value} onChange={onDrawerClick}>
           <BottomNavigationAction
             label='Profile'

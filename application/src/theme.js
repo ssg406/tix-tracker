@@ -12,7 +12,11 @@ export const theme = createTheme({
       main: '#262626', // neutral-800
       contrastText: '#f5f5f5', // neutral-100
     },
-    contrastThreshold: 3,
+    contrastThreshold: 4.5,
     tonalOffset: 0.2,
+  },
+  typography: {
+    fontWeightMedium: 500,
+    fontWeightBold: 700,
   },
 });
