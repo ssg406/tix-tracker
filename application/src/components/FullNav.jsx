@@ -7,7 +7,10 @@ import { logoutUser } from '../features/users/userSlice';
 const FullNav = () => {
   const dispatch = useAppDispatch();
   return (
-    <nav className='flex gap-6 font-medium text-neutral-100 uppercase '>
+    <nav
+      className='flex gap-6 font-medium text-neutral-100 uppercase'
+      aria-label='primary navigation'
+    >
       {navigationLinks.map(({ id, path, text }) => {
         return (
           <Link

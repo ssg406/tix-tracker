@@ -6,8 +6,8 @@ const Dashboard = () => {
   const user = useAppSelector((state) => state.user.user);
   return (
     <main className='md:container md:mx-auto p-4'>
-      <h2 className='text-xl font-bold tracking-tight'>Dashboard</h2>
-      <h3>Welcome {user.name}</h3>
+      <h1 className='text-xl font-bold tracking-tight'>Dashboard</h1>
+      <h2>Welcome {user.name}</h2>
       <Alert />
       <TicketsContainer />
     </main>

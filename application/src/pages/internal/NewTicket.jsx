@@ -106,9 +106,9 @@ const NewTicket = () => {
 
   return (
     <main className='p-4 md:container md:mx-auto'>
-      <h2 className='text-xl font-bold tracking-tight mb-6'>
+      <h1 className='text-xl font-bold tracking-tight mb-6'>
         {isEditing.flag ? 'Edit Ticket' : 'Create Ticket'}
-      </h2>
+      </h1>
       {(addIsLoading || updatingIsLoading) && <CircularProgress />}
       <Alert />
       <form className='flex flex-col gap-4'>

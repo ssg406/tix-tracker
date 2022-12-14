@@ -88,9 +88,9 @@ const Register = () => {
   return (
     <div className='md:container md:mx-auto md:max-w-lg p-4 flex flex-col gap-6 items-center justify-center  h-screen'>
       <img className='h-16 md:h-24' src={Logo} alt='trakr logo' />
-      <h2 className='text-xl font-medium tracking-tight'>
+      <h1 className='text-xl font-medium tracking-tight'>
         {formState.isMember ? 'Login' : 'Create Account'}
-      </h2>
+      </h1>
       {status === 'loading' && <CircularProgress />}
       <Alert />
       <form className='w-full p-2 flex flex-col gap-6 md:p-8 md:bg-slate-100 md:rounded-xl'>

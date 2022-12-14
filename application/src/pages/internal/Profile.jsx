@@ -49,9 +49,9 @@ const Profile = () => {
   };
   return (
     <main className='p-4 md:container md:mx-auto'>
-      <h2 className='text-xl font-bold tracking-tight mb-6'>
+      <h1 className='text-xl font-bold tracking-tight mb-6'>
         Account Information
-      </h2>
+      </h1>
       <Alert />
       {status === 'loading' && <CircularProgress />}
       <form className='flex flex-col gap-6 mt-6'>
