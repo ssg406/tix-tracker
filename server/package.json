@@ -5,7 +5,7 @@
   "description": "Trakr API",
   "main": "index.js",
   "scripts": {
-    "server": "cross-env NODE_ENV=prod nodemon server.js",
+    "server": "cross-env NODE_ENV=production nodemon server.js",
     "client": "npm start --prefix ../application",
     "test": "cross-env NODE_ENV=test nodemon -x mocha",
     "start": "concurrently --kill-others-on-fail \" npm run server\" \"npm run client\""
