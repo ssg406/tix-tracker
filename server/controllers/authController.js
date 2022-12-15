@@ -12,6 +12,10 @@ const registerUser = async (req, res, next) => {
     // Throws if fields are missing or email duplicated
     const user = await User.create(req.body);
     const token = user.createToken();
+
+    // Send cookie containing token
+    res.cookie('token', token, { httpOnly: true });
+
     res.status(StatusCodes.CREATED).json({
       user: {
         userId: user._id,
@@ -50,6 +54,10 @@ const loginUser = async (req, res, next) => {
     const authorized = await user.checkPassword(password);
     if (authorized) {
       const token = user.createToken();
+
+      // Send cookie containing token
+      res.cookie('token', token, { httpOnly: true });
+
       res.status(StatusCodes.OK).json({
         user: {
           userId: user._id,
@@ -87,6 +95,9 @@ const updateUser = async (req, res, next) => {
 
     await user.save();
     const token = user.createToken();
+
+    // Send cookie containing token
+    res.cookie('token', token, { httpOnly: true });
 
     res.status(StatusCodes.OK).json({
       user: {

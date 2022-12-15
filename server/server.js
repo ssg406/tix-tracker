@@ -5,6 +5,7 @@ import mongoSanitize from 'express-mongo-sanitize';
 import cookieParser from 'cookie-parser';
 import xss from 'xss-clean';
 import cors from 'cors';
+import { expressjwt as jwt } from 'express-jwt';
 
 // MongoDB connection
 import dbConnector from './dbConnector.js';
@@ -15,7 +16,6 @@ import ticketRouter from './routes/ticketRouter.js';
 
 // Middleware
 import errorHandler from './middleware/errorHandler.js';
-import checkToken from './middleware/authHandler.js';
 import notFound from './middleware/notFound.js';
 
 // Configuration
@@ -27,11 +27,21 @@ app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(xss());
 app.use(mongoSanitize());
+
+// Cookies
 app.use(cookieParser());
 
 // Router middleware
 app.use('/api/v1/auth', authRouter);
-app.use('/api/v1/tickets', checkToken, ticketRouter);
+app.use(
+  '/api/v1/tickets',
+  jwt({
+    secret: process.env.JWT_SECRET,
+    getToken: (req) => req.cookies.token,
+    algorithms: ['HS256'],
+  }),
+  ticketRouter
+);
 
 // Not found middleware
 app.use(notFound);

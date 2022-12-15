@@ -1,22 +1,22 @@
-import StatusCodes from "http-status-codes";
+import StatusCodes from 'http-status-codes';
 
 const errorHandler = (err, req, res, next) => {
   const thrownError = {
     statusCode: err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
-    message: err.message || "Internal server error. Please wait and try again.",
+    message: err.message || 'Internal server error. Please wait and try again.',
   };
 
   // Check for mongoose ValidationErrors
-  if (err.name === "ValidationError") {
+  if (err.name === 'ValidationError') {
     // Get field and message for each validation error
     const fields = Object.values(err.errors).map((field) => field.path);
     const message = Object.values(err.errors)
       .map((field) => field.message)
-      .join(". ");
+      .join('. ');
     res.status(StatusCodes.BAD_REQUEST).json({ fields, message });
   }
   // Check for invalid argument to mongoose function, such as invalid ID
-  else if (err.name === "CastError") {
+  else if (err.name === 'CastError') {
     const field = err.path;
     const messages = `${field} is invalid for the given request`;
     res.status(StatusCodes.BAD_REQUEST).json({ fields, message });
@@ -27,6 +27,8 @@ const errorHandler = (err, req, res, next) => {
     const message = `An account with the specified ${fields} already exists`;
     res.status(StatusCodes.CONFLICT).json({ fields, message });
     // Return general error
+  } else if (err.name === 'UnauthorizedError') {
+    res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Invalid token' });
   } else {
     res.status(thrownError.statusCode).json({ message: thrownError.message });
   }
